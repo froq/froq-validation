@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace Froq\Validation;
 
-use Froq\Util\Traits\GetterTrait as Getter;
+use Froq\Util\Traits\GetterTrait;
 
 /**
  * @package    Froq
@@ -35,9 +35,9 @@ final class ValidationRule
 {
     /**
      * Getter.
-     * @object Froq\Util\Traits\Getter
+     * @object Froq\Util\Traits\GetterTrait
      */
-    use Getter;
+    use GetterTrait;
 
     /**
      * Field name.
