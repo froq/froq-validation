@@ -76,49 +76,49 @@ final class ValidationRule
     private $isRequired = false;
 
     /**
-     * Unsigned flag for numerics.
+     * Is unsigned.
      * @var bool
      */
     private $isUnsigned = false;
 
     /**
-     * Fixed flag (will truncate and suppress fail if input exceeds the limit).
+     * Is fixed (will truncate and suppress fail if input exceeds the limit).
      * @var bool
      */
     private $isFixed = false;
 
     /**
-     * Specification.
+     * Spec.
      * @var any
      */
     private $spec;
 
     /**
-     * Specification type shortcut.
+     * Spec type.
      * @var string
      */
     private $specType;
 
     /**
-     * Limit value(s).
+     * Limit.
      * @var int|array
      */
     private $limit;
 
     /**
-     * Lower limit.
+     * Limit min.
      * @var int
      */
     private $limitMin;
 
     /**
-     * Upper limit.
+     * Limit max.
      * @var int
      */
     private $limitMax;
 
     /**
-     * Fail text.
+     * Fail.
      * @var string
      */
     private $fail;
@@ -382,6 +382,7 @@ final class ValidationRule
     }
 
     /**
+     * Is required.
      * @return bool
      */
     final public function isRequired(): bool
@@ -390,6 +391,7 @@ final class ValidationRule
     }
 
     /**
+     * Is unsigned.
      * @return bool
      */
     final public function isUnsigned(): bool
@@ -398,6 +400,7 @@ final class ValidationRule
     }
 
     /**
+     * Is fixed.
      * @return bool
      */
     final public function isFixed(): bool
@@ -406,6 +409,7 @@ final class ValidationRule
     }
 
     /**
+     * Is int.
      * @return bool
      */
     final public function isInt(): bool
@@ -414,6 +418,7 @@ final class ValidationRule
     }
 
     /**
+     * Is float.
      * @return bool
      */
     final public function isFloat(): bool
@@ -422,6 +427,7 @@ final class ValidationRule
     }
 
     /**
+     * Is string.
      * @return bool
      */
     final public function isString(): bool
@@ -430,6 +436,7 @@ final class ValidationRule
     }
 
     /**
+     * Is numeric.
      * @return bool
      */
     final public function isNumeric(): bool
@@ -438,6 +445,7 @@ final class ValidationRule
     }
 
     /**
+     * Is bool.
      * @return bool
      */
     final public function isBool(): bool
@@ -446,6 +454,7 @@ final class ValidationRule
     }
 
     /**
+     * Is enum.
      * @return bool
      */
     final public function isEnum(): bool
@@ -454,6 +463,7 @@ final class ValidationRule
     }
 
     /**
+     * Is email.
      * @return bool
      */
     final public function isEmail(): bool
@@ -462,6 +472,7 @@ final class ValidationRule
     }
 
     /**
+     * Is date.
      * @return bool
      */
     final public function isDate(): bool
@@ -470,6 +481,7 @@ final class ValidationRule
     }
 
     /**
+     * Is datetime.
      * @return bool
      */
     final public function isDateTime(): bool
