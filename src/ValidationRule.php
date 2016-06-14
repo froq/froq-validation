@@ -387,7 +387,7 @@ final class ValidationRule
      */
     final public function isRequired(): bool
     {
-        return ($this->isRequired == true);
+        return !!$this->isRequired;
     }
 
     /**
@@ -396,7 +396,7 @@ final class ValidationRule
      */
     final public function isUnsigned(): bool
     {
-        return ($this->isUnsigned == true);
+        return !!$this->isUnsigned;
     }
 
     /**
@@ -405,7 +405,7 @@ final class ValidationRule
      */
     final public function isFixed(): bool
     {
-        return ($this->isFixed == true);
+        return !!$this->isFixed;
     }
 
     /**
