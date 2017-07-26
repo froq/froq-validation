@@ -35,18 +35,18 @@ final class Validation
      * Types.
      * @const string
      */
-    const TYPE_INT            = 'int',
-          TYPE_FLOAT          = 'float',
-          TYPE_NUMERIC        = 'numeric',
-          TYPE_STRING         = 'string',
-          TYPE_BOOL           = 'bool',
-          TYPE_ENUM           = 'enum',
-          TYPE_EMAIL          = 'email',
-          TYPE_DATE           = 'date',
-          TYPE_DATETIME       = 'datetime';
+    public const TYPE_INT        = 'int',
+                 TYPE_FLOAT      = 'float',
+                 TYPE_NUMERIC    = 'numeric',
+                 TYPE_STRING     = 'string',
+                 TYPE_BOOL       = 'bool',
+                 TYPE_ENUM       = 'enum',
+                 TYPE_EMAIL      = 'email',
+                 TYPE_DATE       = 'date',
+                 TYPE_DATETIME   = 'datetime';
 
     // @todo Replace invalid characters.
-    const ENCODING            = ['ascii', 'unicode'];
+    public const ENCODING        = ['ascii', 'unicode'];
 
     /**
      * Rules.
@@ -73,13 +73,13 @@ final class Validation
 
     /**
      * Validate.
-     * @param  string $key
-     * @param  array  &$data      This will overwrite sanitizing input data.
-     * @param  array  &$fails     Shortcut instead of to call self::getFails().
-     * @param  bool   $dropUndefs This will drop undefined data keys
+     * @param  string  $key
+     * @param  array   &$data      This will overwrite sanitizing input data.
+     * @param  ?array  &$fails     Shortcut instead of to call self::getFails().
+     * @param  bool    $dropUndefs This will drop undefined data keys
      * @return bool
      */
-    public function validate(string $key, array &$data, &$fails = [], bool $dropUndefs = true): bool
+    public function validate(string $key, array &$data, ?array &$fails = null, bool $dropUndefs = true): bool
     {
         // no rule to validate
         if (!isset($this->rules[$key])) {
