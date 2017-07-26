@@ -23,8 +23,6 @@ declare(strict_types=1);
 
 namespace Froq\Validation;
 
-use Froq\Util\Traits\GetterTrait;
-
 /**
  * @package    Froq
  * @subpackage Froq\Validation
@@ -33,12 +31,6 @@ use Froq\Util\Traits\GetterTrait;
  */
 final class ValidationRule
 {
-    /**
-     * Getter.
-     * @object Froq\Util\Traits\GetterTrait
-     */
-    use GetterTrait;
-
     /**
      * Field name.
      * @var string
@@ -101,19 +93,19 @@ final class ValidationRule
 
     /**
      * Limit.
-     * @var int|array
+     * @var int|float|array
      */
     private $limit;
 
     /**
      * Limit min.
-     * @var int
+     * @var float
      */
     private $limitMin;
 
     /**
      * Limit max.
-     * @var int
+     * @var float
      */
     private $limitMax;
 
@@ -269,8 +261,7 @@ final class ValidationRule
                 }
 
                 // sanitize
-                $input = ($this->fieldType == Validation::TYPE_INT)
-                    ? (int) $input : (float) $input;
+                $input = ($this->fieldType == Validation::TYPE_INT) ? (int) $input : (float) $input;
 
                 // make unsigned
                 if ($this->isUnsigned) {
@@ -279,7 +270,7 @@ final class ValidationRule
 
                 // check limit(s)
                 if ($this->limit !== null) {
-                    if (is_numeric($this->limit) && $input !== $this->limit) {
+                    if (is_numeric($this->limit) && strval($input) !== strval($this->limit)) {
                         $this->fail = "Field value could be only {$this->limit}.";
                         return false;
                     }
@@ -341,16 +332,14 @@ final class ValidationRule
                 }
 
                 if (!in_array($input, $this->spec)) {
-                    $this->fail = sprintf('Field value should be one of %s options.',
-                        join(', ', $this->spec));
+                    $this->fail = sprintf('Field value should be one of %s options.', join(', ', $this->spec));
                     return false;
                 }
                 break;
             case Validation::TYPE_ENUM:
                 // @todo Multi-arrays?
                 if (!in_array($input, $this->spec)) {
-                    $this->fail = sprintf('Field value should be one of %s options.',
-                        join(', ', $this->spec));
+                    $this->fail = sprintf('Field value should be one of %s options.', join(', ', $this->spec));
                     return false;
                 }
                 break;
@@ -367,13 +356,10 @@ final class ValidationRule
                     return false;
                 }
 
-                // simply date check
-                try {
-                    if ($input && date($this->spec, strtotime($input)) != $input) {
-                        $this->fail = 'Field value is not valid date/datetime.';
-                        return false;
-                    }
-                } catch (\Throwable $e){}
+                if ($input && $input != date($this->spec, strtotime($input))) {
+                    $this->fail = 'Field value is not valid date/datetime.';
+                    return false;
+                }
                 break;
         }
 
@@ -382,12 +368,111 @@ final class ValidationRule
     }
 
     /**
+     * Get field name.
+     * @return string
+     */
+    public function getFieldName(): string
+    {
+        return $this->fieldName;
+    }
+
+    /**
+     * Get field type.
+     * @return string
+     */
+    public function getFieldType(): string
+    {
+        return $this->fieldType;
+    }
+
+    /**
+     * Get options.
+     * @return array
+     */
+    public function getFieldOptions(): array
+    {
+        return $this->fieldOptions;
+    }
+
+    /**
+     * Get field default.
+     * @return any
+     */
+    public function getFieldDefault()
+    {
+        return $this->fieldDefault;
+    }
+
+    /**
+     * Get field encoding.
+     * @return ?string
+     */
+    public function getFieldEncoding(): ?string
+    {
+        return $this->fieldEncoding;
+    }
+
+    /**
+     * Get spec.
+     * @return any
+     */
+    public function getSpec()
+    {
+        return $this->spec;
+    }
+
+    /**
+     * Get spec type.
+     * @return ?string
+     */
+    public function getSpecType(): ?string
+    {
+        return $this->specType;
+    }
+
+    /**
+     * Get limit.
+     * @return any
+     */
+    public function getLimit()
+    {
+        return $this->limit;
+    }
+
+    /**
+     * Get limit min.
+     * @return ?float
+     */
+    public function getLimitMin(): ?float
+    {
+        return $this->limitMin;
+    }
+
+    /**
+     * Get limit max.
+     * @return ?float
+     */
+    public function getLimitMax(): ?float
+    {
+        return $this->limitMax;
+    }
+
+    /**
+     * Get fail.
+     * @return ?string
+     */
+    public function getFail(): ?string
+    {
+        return $this->fail;
+    }
+
+    /**
      * Is required.
      * @return bool
      */
     final public function isRequired(): bool
     {
-        return !!$this->isRequired;
+        return $this->isRequired == true;
     }
 
     /**
@@ -396,7 +481,7 @@ final class ValidationRule
      */
     final public function isUnsigned(): bool
     {
-        return !!$this->isUnsigned;
+        return $this->isUnsigned == true;
     }
 
     /**
@@ -405,7 +490,7 @@ final class ValidationRule
      */
     final public function isFixed(): bool
     {
-        return !!$this->isFixed;
+        return $this->isFixed == true;
     }
 
     /**
@@ -414,7 +499,7 @@ final class ValidationRule
      */
     final public function isInt(): bool
     {
-        return ($this->fieldType == Validation::TYPE_INT);
+        return $this->fieldType == Validation::TYPE_INT;
     }
 
     /**
@@ -423,7 +508,7 @@ final class ValidationRule
      */
     final public function isFloat(): bool
     {
-        return ($this->fieldType == Validation::TYPE_FLOAT);
+        return $this->fieldType == Validation::TYPE_FLOAT;
     }
 
     /**
@@ -432,7 +517,7 @@ final class ValidationRule
      */
     final public function isString(): bool
     {
-        return ($this->fieldType == Validation::TYPE_STRING);
+        return $this->fieldType == Validation::TYPE_STRING;
     }
 
     /**
@@ -441,7 +526,7 @@ final class ValidationRule
      */
     final public function isNumeric(): bool
     {
-        return ($this->fieldType == Validation::TYPE_NUMERIC);
+        return $this->fieldType == Validation::TYPE_NUMERIC;
     }
 
     /**
@@ -450,7 +535,7 @@ final class ValidationRule
      */
     final public function isBool(): bool
     {
-        return ($this->fieldType == Validation::TYPE_BOOL);
+        return $this->fieldType == Validation::TYPE_BOOL;
     }
 
     /**
@@ -459,7 +544,7 @@ final class ValidationRule
      */
     final public function isEnum(): bool
     {
-        return ($this->fieldType == Validation::TYPE_ENUM);
+        return $this->fieldType == Validation::TYPE_ENUM;
     }
 
     /**
@@ -468,7 +553,7 @@ final class ValidationRule
      */
     final public function isEmail(): bool
     {
-        return ($this->fieldType == Validation::TYPE_EMAIL);
+        return $this->fieldType == Validation::TYPE_EMAIL;
     }
 
     /**
@@ -477,7 +562,7 @@ final class ValidationRule
      */
     final public function isDate(): bool
     {
-        return ($this->fieldType == Validation::TYPE_DATE);
+        return $this->fieldType == Validation::TYPE_DATE;
     }
 
     /**
@@ -486,6 +571,6 @@ final class ValidationRule
      */
     final public function isDateTime(): bool
     {
-        return ($this->fieldType == Validation::TYPE_DATETIME);
+        return $this->fieldType == Validation::TYPE_DATETIME;
     }
 }
