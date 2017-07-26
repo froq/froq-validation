@@ -64,9 +64,9 @@ final class Validation
      * Constructor.
      * @param array|null $rules
      */
-    final public function __construct(array $rules = null)
+    public function __construct(array $rules = null)
     {
-        if (!empty($rules)) {
+        if ($rules != null) {
             $this->setRules($rules);
         }
     }
@@ -79,8 +79,7 @@ final class Validation
      * @param  bool   $dropUndefs This will drop undefined data keys
      * @return bool
      */
-    final public function validate(string $key, array &$data, &$fails = [],
-        bool $dropUndefs = true): bool
+    public function validate(string $key, array &$data, &$fails = [], bool $dropUndefs = true): bool
     {
         // no rule to validate
         if (!isset($this->rules[$key])) {
@@ -133,7 +132,7 @@ final class Validation
      * @param  array $rules
      * @return self
      */
-    final public function setRules(array $rules): self
+    public function setRules(array $rules): self
     {
         foreach ($rules as $key => $fields) {
             foreach ($fields as $fieldName => $fieldOptions) {
@@ -148,7 +147,7 @@ final class Validation
      * Get rules.
      * @return array
      */
-    final public function getRules(): array
+    public function getRules(): array
     {
         return $this->rules;
     }
@@ -158,7 +157,7 @@ final class Validation
      * @param  array $fails
      * @return self
      */
-    final public function setFails(array $fails = null): self
+    public function setFails(array $fails = null): self
     {
         if (!empty($fails)) {
             foreach ($fails as $fieldName => $fail) {
@@ -173,7 +172,7 @@ final class Validation
      * Get fails.
      * @return array
      */
-    final public function getFails(): array
+    public function getFails(): array
     {
         return $this->fails;
     }

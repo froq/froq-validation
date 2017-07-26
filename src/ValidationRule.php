@@ -120,7 +120,7 @@ final class ValidationRule
      * @param string $fieldName
      * @param array  $fieldOptions
      */
-    final public function __construct(string $fieldName, array $fieldOptions)
+    public function __construct(string $fieldName, array $fieldOptions)
     {
         $this->fieldName = $fieldName;
         $this->fieldOptions = $fieldOptions;
@@ -229,7 +229,7 @@ final class ValidationRule
      * @param  any &$input
      * @return bool
      */
-    final public function ok(&$input): bool
+    public function ok(&$input): bool
     {
         $input = trim((string) $input);
 
@@ -470,7 +470,7 @@ final class ValidationRule
      * Is required.
      * @return bool
      */
-    final public function isRequired(): bool
+    public function isRequired(): bool
     {
         return $this->isRequired == true;
     }
@@ -479,7 +479,7 @@ final class ValidationRule
      * Is unsigned.
      * @return bool
      */
-    final public function isUnsigned(): bool
+    public function isUnsigned(): bool
     {
         return $this->isUnsigned == true;
     }
@@ -488,7 +488,7 @@ final class ValidationRule
      * Is fixed.
      * @return bool
      */
-    final public function isFixed(): bool
+    public function isFixed(): bool
     {
         return $this->isFixed == true;
     }
@@ -497,7 +497,7 @@ final class ValidationRule
      * Is int.
      * @return bool
      */
-    final public function isInt(): bool
+    public function isInt(): bool
     {
         return $this->fieldType == Validation::TYPE_INT;
     }
@@ -506,7 +506,7 @@ final class ValidationRule
      * Is float.
      * @return bool
      */
-    final public function isFloat(): bool
+    public function isFloat(): bool
     {
         return $this->fieldType == Validation::TYPE_FLOAT;
     }
@@ -515,7 +515,7 @@ final class ValidationRule
      * Is string.
      * @return bool
      */
-    final public function isString(): bool
+    public function isString(): bool
     {
         return $this->fieldType == Validation::TYPE_STRING;
     }
@@ -524,7 +524,7 @@ final class ValidationRule
      * Is numeric.
      * @return bool
      */
-    final public function isNumeric(): bool
+    public function isNumeric(): bool
     {
         return $this->fieldType == Validation::TYPE_NUMERIC;
     }
@@ -533,7 +533,7 @@ final class ValidationRule
      * Is bool.
      * @return bool
      */
-    final public function isBool(): bool
+    public function isBool(): bool
     {
         return $this->fieldType == Validation::TYPE_BOOL;
     }
@@ -542,7 +542,7 @@ final class ValidationRule
      * Is enum.
      * @return bool
      */
-    final public function isEnum(): bool
+    public function isEnum(): bool
     {
         return $this->fieldType == Validation::TYPE_ENUM;
     }
@@ -551,7 +551,7 @@ final class ValidationRule
      * Is email.
      * @return bool
      */
-    final public function isEmail(): bool
+    public function isEmail(): bool
     {
         return $this->fieldType == Validation::TYPE_EMAIL;
     }
@@ -560,7 +560,7 @@ final class ValidationRule
      * Is date.
      * @return bool
      */
-    final public function isDate(): bool
+    public function isDate(): bool
     {
         return $this->fieldType == Validation::TYPE_DATE;
     }
@@ -569,7 +569,7 @@ final class ValidationRule
      * Is datetime.
      * @return bool
      */
-    final public function isDateTime(): bool
+    public function isDateTime(): bool
     {
         return $this->fieldType == Validation::TYPE_DATETIME;
     }
