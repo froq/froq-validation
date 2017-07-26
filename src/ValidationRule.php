@@ -194,7 +194,7 @@ final class ValidationRule
         if (isset($this->fieldOptions['limit'])) {
             $this->limit = $this->fieldOptions['limit'];
             if (is_array($this->limit)) {
-                @ list($limitMin, $limitMax) = $this->limit;
+                @ [$limitMin, $limitMax] = $this->limit;
                 if (isset($limitMin)) {
                     $this->limitMin = (float) $limitMin;
                 }
