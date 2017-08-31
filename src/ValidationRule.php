@@ -132,7 +132,7 @@ final class ValidationRule
         // set type first
         if (!isset($this->fieldOptions['type'])) {
             throw new ValidationException(
-                "Field type is not set in validation rules (field name: {$this->fieldName}).");
+                "Field type is not set in validation rules (field: {$this->fieldName}).");
         } elseif (!in_array($this->fieldOptions['type'], [
             Validation::TYPE_INT,
             Validation::TYPE_FLOAT,
@@ -165,7 +165,7 @@ final class ValidationRule
             case Validation::TYPE_DATETIME:
                 if (!isset($this->fieldOptions['spec'])) {
                     throw new ValidationException(
-                        "Enum, date and datetime types requires 'spec' definition (field name: {$this->fieldName})");
+                        "Enum, date and datetime types requires 'spec' definition (field: {$this->fieldName})");
                 }
                 break;
         }
@@ -176,12 +176,12 @@ final class ValidationRule
             $this->specType = gettype($this->spec);
 
             if ($this->specType != 'array' && $this->fieldType == Validation::TYPE_ENUM) {
-                throw new ValidationException("Wrong spec given (field: {$this->fieldName}).");
+                throw new ValidationException("Wrong spec given, only an array accepted (field: {$this->fieldName}).");
             }
 
-            // detect regex spec
+            // detect regexp spec
             if ($this->specType == 'string' && $this->spec[0] == '~') {
-                $this->specType = 'regex';
+                $this->specType = 'regexp';
             }
         }
 
@@ -295,8 +295,8 @@ final class ValidationRule
                 }
                 break;
             case Validation::TYPE_STRING:
-                // check regex if provided
-                if ($this->specType == 'regex' && !preg_match($this->spec, $input)) {
+                // check regexp if provided
+                if ($this->specType == 'regexp' && !preg_match($this->spec, $input)) {
                     $this->fail = 'Field value didn not match with given pattern.';
                     return false;
                 }
@@ -351,7 +351,7 @@ final class ValidationRule
                 break;
             case Validation::TYPE_DATE:
             case Validation::TYPE_DATETIME:
-                if ($this->specType == 'regex' && !preg_match($this->spec, $input)) {
+                if ($this->specType == 'regexp' && !preg_match($this->spec, $input)) {
                     $this->fail = 'Field value did not match with given pattern.';
                     return false;
                 }
