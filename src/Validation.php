@@ -73,13 +73,13 @@ final class Validation
 
     /**
      * Validate.
-     * @param  string  $key
-     * @param  array   &$data      This will overwrite sanitizing input data.
-     * @param  ?array  &$fails     Shortcut instead of to call self::getFails().
-     * @param  bool    $dropUndefs This will drop undefined data keys
+     * @param  string     $key
+     * @param  array      &$data      This will overwrite sanitizing input data.
+     * @param  array|null &$fails     Shortcut instead of to call self::getFails().
+     * @param  bool       $dropUndefs This will drop undefined data keys
      * @return bool
      */
-    public function validate(string $key, array &$data, ?array &$fails = null, bool $dropUndefs = true): bool
+    public function validate(string $key, array &$data, array &$fails = null, bool $dropUndefs = true): bool
     {
         // no rule to validate
         if (!isset($this->rules[$key])) {
