@@ -107,12 +107,12 @@ final class Validation
         }
 
         foreach ($rules as $rule) {
-            $fieldName = $rule->fieldName;
+            $fieldName = $rule->getFieldName();
             $fieldValue = (string) $data[$fieldName];
 
             // real check here sanitizing/overwriting input data
             if (!$rule->ok($fieldValue)) {
-                $fails[$fieldName] = $rule->fail;
+                $fails[$fieldName] = $rule->getFail();
             }
 
             // overwrite
