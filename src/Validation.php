@@ -117,7 +117,7 @@ final class Validation
 
                     // real check here sanitizing/overwriting input data
                     if (!$nRules->ok($fieldValue)) {
-                        $fails[$name][$fieldName] = $nRules->getFail();
+                        $fails[$name .'.'. $fieldName] = $nRules->getFail();
                     }
 
                     // overwrite

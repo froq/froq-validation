@@ -377,7 +377,7 @@ final class ValidationRule
                         }
                     }
                     if (!empty($components)) {
-                        $this->fail = sprintf('Field value is not a valid URL (required components: %s).',
+                        $this->fail = sprintf('Field value is not a valid URL (missing components: %s).',
                             join(', ', $components));
                         return false;
                     }
