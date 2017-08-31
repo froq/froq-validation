@@ -43,7 +43,9 @@ final class Validation
                  TYPE_ENUM       = 'enum',
                  TYPE_EMAIL      = 'email',
                  TYPE_DATE       = 'date',
-                 TYPE_DATETIME   = 'datetime';
+                 TYPE_DATETIME   = 'datetime',
+                 TYPE_ARRAY      = 'array',
+                 TYPE_URL        = 'url';
 
     // @todo Replace invalid characters.
     public const ENCODING        = ['ascii', 'unicode'];
@@ -106,17 +108,33 @@ final class Validation
             }
         }
 
-        foreach ($rules as $rule) {
-            $fieldName = $rule->getFieldName();
-            $fieldValue = (string) $data[$fieldName];
+        foreach ($rules as $name => $rule) {
+            // nested?
+            if (is_array($rule)) {
+                foreach ($rule as $nRules) {
+                    $fieldName = $nRules->getFieldName();
+                    $fieldValue =@ (string) $data[$name][$fieldName];
 
-            // real check here sanitizing/overwriting input data
-            if (!$rule->ok($fieldValue)) {
-                $fails[$fieldName] = $rule->getFail();
+                    // real check here sanitizing/overwriting input data
+                    if (!$nRules->ok($fieldValue)) {
+                        $fails[$name][$fieldName] = $nRules->getFail();
+                    }
+
+                    // overwrite
+                    $data[$name][$fieldName] = $fieldValue;
+                }
+            } else {
+                $fieldName = $rule->getFieldName();
+                $fieldValue =@ (string) $data[$fieldName];
+
+                // real check here sanitizing/overwriting input data
+                if (!$rule->ok($fieldValue)) {
+                    $fails[$fieldName] = $rule->getFail();
+                }
+
+                // overwrite
+                $data[$fieldName] = $fieldValue;
             }
-
-            // overwrite
-            $data[$fieldName] = $fieldValue;
         }
 
         // store for later
@@ -136,7 +154,21 @@ final class Validation
     {
         foreach ($rules as $key => $fields) {
             foreach ($fields as $fieldName => $fieldOptions) {
-                $this->rules[$key][$fieldName] = new ValidationRule($fieldName, $fieldOptions);
+                // nested?
+                $fieldType =@ $fieldOptions['type'];
+                if ($fieldType == self::TYPE_ARRAY) {
+                    $fieldSpec =@ $fieldOptions['spec'];
+                    if (empty($fieldSpec)) {
+                        throw new ValidationException(
+                            "For array types, 'spec' field must be a non-empty array (field: {$fieldName}).");
+                    }
+                    foreach ((array) $fieldSpec as $fieldSpecFieldName => $fieldSpecFieldOptions) {
+                        $this->rules[$key][$fieldName][$fieldSpecFieldName] =
+                            new ValidationRule($fieldSpecFieldName, $fieldSpecFieldOptions);
+                    }
+                } else {
+                    $this->rules[$key][$fieldName] = new ValidationRule($fieldName, $fieldOptions);
+                }
             }
         }
 

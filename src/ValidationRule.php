@@ -126,7 +126,7 @@ final class ValidationRule
         $this->fieldOptions = $fieldOptions;
 
         if (empty($this->fieldOptions)) {
-            throw new ValidationException('Field options should not be empty.');
+            throw new ValidationException('Field options must not be empty.');
         }
 
         // set type first
@@ -143,6 +143,7 @@ final class ValidationRule
             Validation::TYPE_EMAIL,
             Validation::TYPE_DATE,
             Validation::TYPE_DATETIME,
+            Validation::TYPE_URL,
         ])) {
             throw new ValidationException(
                 "Field type is not valid (field type: {$this->fieldOptions['type']}).");
@@ -204,14 +205,14 @@ final class ValidationRule
             }
         }
 
-        // set other rules
+        // set other rules (eg: [foo => [type => int, ... [required, ...]]])
         foreach ($this->fieldOptions as $key => $value) {
             if (is_int($key) && is_array($value)) {
                 foreach ($value as $option) {
                     switch ($option) {
                         case 'required': $this->isRequired = true; break;
                         case 'unsigned': $this->isUnsigned = true; break;
-                        case     'fixed': $this->isFixed   = true; break;
+                        case    'fixed': $this->isFixed    = true; break;
                         // default: ignore others for now..
                     }
                 }
@@ -261,7 +262,7 @@ final class ValidationRule
                 }
 
                 // sanitize
-                $input = ($this->fieldType == Validation::TYPE_INT) ? (int) $input : (float) $input;
+                $input = ($this->fieldType == Validation::TYPE_INT) ? intval($input) : floatval($input);
 
                 // make unsigned
                 if ($this->isUnsigned) {
@@ -332,14 +333,14 @@ final class ValidationRule
                 }
 
                 if (!in_array($input, $this->spec)) {
-                    $this->fail = sprintf('Field value should be one of %s options.', join(', ', $this->spec));
+                    $this->fail = sprintf('Field value must be one of %s options.', join(', ', $this->spec));
                     return false;
                 }
                 break;
             case Validation::TYPE_ENUM:
                 // @todo Multi-arrays?
                 if (!in_array($input, $this->spec)) {
-                    $this->fail = sprintf('Field value should be one of %s options.', join(', ', $this->spec));
+                    $this->fail = sprintf('Field value must be one of %s options.', join(', ', $this->spec));
                     return false;
                 }
                 break;
@@ -356,8 +357,34 @@ final class ValidationRule
                     return false;
                 }
 
-                if ($input && $input != date($this->spec, strtotime($input))) {
+                if ($input != date($this->spec, strtotime($input))) {
                     $this->fail = 'Field value is not valid date/datetime.';
+                    return false;
+                }
+                break;
+            case Validation::TYPE_URL:
+                if ($this->specType == 'regexp' && !preg_match($this->spec, $input)) {
+                    $this->fail = 'Field value did not match with given pattern.';
+                    return false;
+                }
+                if ($this->specType == 'array') {
+                    // remove silly empty components (eg: path always comes even url is empty)
+                    $url = array_filter((array) parse_url($input), 'strlen');
+                    $components = [];
+                    foreach ($this->spec as $component) {
+                        if (!isset($url[$component])) {
+                            $components[] = $component;
+                        }
+                    }
+                    if (!empty($components)) {
+                        $this->fail = sprintf('Field value is not a valid URL (required components: %s).',
+                            join(', ', $components));
+                        return false;
+                    }
+                    return true;
+                }
+                if (!filter_var($input, FILTER_VALIDATE_URL)) {
+                    $this->fail = 'Field value is not a valid URL.';
                     return false;
                 }
                 break;
