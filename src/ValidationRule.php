@@ -38,6 +38,12 @@ final class ValidationRule
     private $fieldName;
 
     /**
+     * Field label.
+     * @var string
+     */
+    private $fieldLabel;
+
+    /**
      * Field type.
      * @var string
      */
@@ -122,12 +128,13 @@ final class ValidationRule
      */
     public function __construct(string $fieldName, array $fieldOptions)
     {
-        $this->fieldName = $fieldName;
-        $this->fieldOptions = $fieldOptions;
-
-        if (empty($this->fieldOptions)) {
+        if (empty($fieldOptions)) {
             throw new ValidationException('Field options must not be empty.');
         }
+
+        $this->fieldName = $fieldName;
+        $this->fieldLabel = $fieldOptions['label'] ?? null;
+        $this->fieldOptions = $fieldOptions;
 
         // set type first
         if (!isset($this->fieldOptions['type'])) {
@@ -233,10 +240,11 @@ final class ValidationRule
     public function ok(&$input): bool
     {
         $input = trim((string) $input);
+        $inputLabel = trim($this->fieldLabel ?: 'Field');
 
         // check required issue
         if ($input === '' && $this->isRequired) {
-            $this->fail = 'Field is required.';
+            $this->fail = sprintf('%s is required.', $inputLabel);
             return false;
         }
 
@@ -257,7 +265,7 @@ final class ValidationRule
             case Validation::TYPE_INT:
             case Validation::TYPE_FLOAT:
                 if (!is_numeric($input)) {
-                    $this->fail = "Field value must be {$this->fieldType}.";
+                    $this->fail = sprintf('%s value must be type of %s.', $inputLabel, $this->fieldType);
                     return false;
                 }
 
@@ -272,33 +280,33 @@ final class ValidationRule
                 // check limit(s)
                 if ($this->limit !== null) {
                     if (is_numeric($this->limit) && strval($input) !== strval($this->limit)) {
-                        $this->fail = "Field value could be only {$this->limit}.";
+                        $this->fail = sprintf('%s value could be only %s.', $inputLabel, $this->limit);
                         return false;
                     }
                     if ($this->limitMin !== null && $input < $this->limitMin) {
-                        $this->fail = "Field value could be minimum {$this->limitMin}.";
+                        $this->fail = sprintf('%s value could be minimum %s.', $inputLabel, $this->limitMin);
                         return false;
                     }
                     if ($this->limitMax !== null && $input > $this->limitMax) {
-                        $this->fail = "Field value could be maximum {$this->limitMax}.";
+                        $this->fail = sprintf('%s value could be maximum %s.', $inputLabel, $this->limitMax);
                         return false;
                     }
                 }
                 break;
             case Validation::TYPE_NUMERIC:
                 if (!is_numeric($input)) {
-                    $this->fail = 'Field value must be numeric.';
+                    $this->fail = sprintf('%s value must be numeric.', $inputLabel);
                     return false;
                 }
                 // make unsigned
                 if ($this->isUnsigned) {
-                    $input = preg_replace('~^-+~', '', $input);
+                    $input = abs($input);
                 }
                 break;
             case Validation::TYPE_STRING:
                 // check regexp if provided
                 if ($this->specType == 'regexp' && !preg_match($this->spec, $input)) {
-                    $this->fail = 'Field value didn not match with given pattern.';
+                    $this->fail = sprintf('%s value did not match with given pattern.', $inputLabel);
                     return false;
                 }
 
@@ -307,21 +315,20 @@ final class ValidationRule
                     $isLimitNumeric = is_numeric($this->limit);
                     // should truncate?
                     if ($this->isFixed) {
-                        $input = mb_substr($input, 0,
-                            intval($isLimitNumeric ? $this->limit : $this->limitMax));
+                        $input = mb_substr($input, 0, intval($isLimitNumeric ? $this->limit : $this->limitMax));
                     }
 
                     $inputLen = strlen($input);
                     if ($isLimitNumeric && $inputLen !== $this->limit) {
-                        $this->fail = "Field value length must be {$this->limit}.";
+                        $this->fail = sprintf('%s value length must be %s.', $inputLabel, $this->limit);
                         return false;
                     }
                     if ($this->limitMin !== null && $inputLen < $this->limitMin) {
-                        $this->fail = "Field value minimum length could be {$this->limitMin}.";
+                        $this->fail = sprintf('%s value minimum length could be %s.', $inputLabel, $this->limitMin);
                         return false;
                     }
                     if ($this->limitMax !== null && $inputLen > $this->limitMax) {
-                        $this->fail = "Field value maximum length could be {$this->limitMax}.";
+                        $this->fail = sprintf('%s value maximum length could be %s.', $inputLabel, $this->limitMax);
                         return false;
                     }
                 }
@@ -333,38 +340,38 @@ final class ValidationRule
                 }
 
                 if (!in_array($input, $this->spec)) {
-                    $this->fail = sprintf('Field value must be one of %s options.', join(', ', $this->spec));
+                    $this->fail = sprintf('%s value could be one of %s options.', $inputLabel, join(', ', $this->spec));
                     return false;
                 }
                 break;
             case Validation::TYPE_ENUM:
                 // @todo Multi-arrays?
                 if (!in_array($input, $this->spec)) {
-                    $this->fail = sprintf('Field value must be one of %s options.', join(', ', $this->spec));
+                    $this->fail = sprintf('%s value could be one of %s options.', $inputLabel, join(', ', $this->spec));
                     return false;
                 }
                 break;
             case Validation::TYPE_EMAIL:
                 if (!filter_var($input, FILTER_VALIDATE_EMAIL)) {
-                    $this->fail = 'Field value must be a valid email address.';
+                    $this->fail = sprintf('%s value must be a valid email address.', $inputLabel);
                     return false;
                 }
                 break;
             case Validation::TYPE_DATE:
             case Validation::TYPE_DATETIME:
                 if ($this->specType == 'regexp' && !preg_match($this->spec, $input)) {
-                    $this->fail = 'Field value did not match with given pattern.';
+                    $this->fail = sprintf('%s value did not match with given pattern.', $inputLabel);
                     return false;
                 }
 
                 if ($input != date($this->spec, strtotime($input))) {
-                    $this->fail = 'Field value is not valid date/datetime.';
+                    $this->fail = sprintf('%s value is not valid date/datetime.', $inputLabel);
                     return false;
                 }
                 break;
             case Validation::TYPE_URL:
                 if ($this->specType == 'regexp' && !preg_match($this->spec, $input)) {
-                    $this->fail = 'Field value did not match with given pattern.';
+                    $this->fail = sprintf('%s value did not match with given pattern.', $inputLabel);
                     return false;
                 }
                 if ($this->specType == 'array') {
@@ -377,14 +384,14 @@ final class ValidationRule
                         }
                     }
                     if (!empty($components)) {
-                        $this->fail = sprintf('Field value is not a valid URL (missing components: %s).',
-                            join(', ', $components));
+                        $this->fail = sprintf('%s value is not a valid URL (missing components: %s).',
+                            $inputLabel, join(', ', $components));
                         return false;
                     }
                     return true;
                 }
                 if (!filter_var($input, FILTER_VALIDATE_URL)) {
-                    $this->fail = 'Field value is not a valid URL.';
+                    $this->fail = sprintf('%s value is not a valid URL.', $inputLabel);
                     return false;
                 }
                 break;
@@ -401,6 +408,15 @@ final class ValidationRule
     public function getFieldName(): string
     {
         return $this->fieldName;
+    }
+
+    /**
+     * Get field label.
+     * @return ?string
+     */
+    public function getFieldLabel(): ?string
+    {
+        return $this->fieldLabel;
     }
 
     /**
