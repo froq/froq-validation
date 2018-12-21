@@ -79,7 +79,7 @@ final class Validation
     /**
      * Validate.
      * @param  string     $key
-     * @param  array      &$data      This will overwrite sanitizing input data.
+     * @param  array      &$data      This will override sanitizing input data.
      * @param  array|null &$fails     Shortcut instead of to call self::getFails().
      * @param  bool       $dropUndefs This will drop undefined data keys
      * @return bool
@@ -123,7 +123,7 @@ final class Validation
                         $fails[$name .'.'. $fieldName] = $nRule->getFail();
                     }
 
-                    // overwrite
+                    // override
                     $data[$name][$fieldName] = $fieldValue;
                 }
             } else {
@@ -135,7 +135,7 @@ final class Validation
                     $fails[$fieldName] = $rule->getFail();
                 }
 
-                // overwrite
+                // override
                 $data[$fieldName] = $fieldValue;
             }
         }
@@ -149,7 +149,7 @@ final class Validation
     /**
      * Set rules.
      * @note    This method could be used in "service::init" method
-     * in order to set (overwrite) its values after getting from db etc.
+     * in order to set (override) its values after getting from db etc.
      * @param  array $rules
      * @return self
      */
