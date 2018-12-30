@@ -158,9 +158,9 @@ final class Validation
         foreach ($rules as $key => $fields) {
             foreach ($fields as $fieldName => $fieldOptions) {
                 // nested?
-                $fieldType =@ $fieldOptions['type'];
+                @ $fieldType = $fieldOptions['type'];
                 if ($fieldType == self::TYPE_ARRAY) {
-                    $fieldSpec =@ $fieldOptions['spec'];
+                    @ $fieldSpec = $fieldOptions['spec'];
                     if (empty($fieldSpec)) {
                         throw new ValidationException(
                             "For array types, 'spec' field must be a non-empty array (field: {$fieldName})");
