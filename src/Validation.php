@@ -163,11 +163,12 @@ final class Validation
                     $fieldSpec =@ $fieldOptions['spec'];
                     if (empty($fieldSpec)) {
                         throw new ValidationException(
-                            "For array types, 'spec' field must be a non-empty array (field: {$fieldName}).");
+                            "For array types, 'spec' field must be a non-empty array (field: {$fieldName})");
                     }
                     foreach ((array) $fieldSpec as $fieldSpecFieldName => $fieldSpecFieldOptions) {
-                        $this->rules[$key][$fieldName][$fieldSpecFieldName] =
-                            new ValidationRule($fieldSpecFieldName, $fieldSpecFieldOptions);
+                        $this->rules[$key][$fieldName][$fieldSpecFieldName] = new ValidationRule(
+                            $fieldSpecFieldName, $fieldSpecFieldOptions
+                        );
                     }
                 } else {
                     $this->rules[$key][$fieldName] = new ValidationRule($fieldName, $fieldOptions);
