@@ -132,7 +132,7 @@ final class ValidationRule
     public function __construct(string $fieldName, array $fieldOptions)
     {
         if (empty($fieldOptions)) {
-            throw new ValidationException('Field options must not be empty.');
+            throw new ValidationException('Field options must not be empty');
         }
 
         $this->fieldName = $fieldName;
@@ -142,7 +142,7 @@ final class ValidationRule
         // set type first
         if (!isset($this->fieldOptions['type'])) {
             throw new ValidationException(
-                "Field type is not set in validation rules (field: {$this->fieldName}).");
+                "Field type is not set in validation rules (field: {$this->fieldName})");
         } elseif (!in_array($this->fieldOptions['type'], [
             Validation::TYPE_INT,
             Validation::TYPE_FLOAT,
@@ -156,7 +156,7 @@ final class ValidationRule
             Validation::TYPE_URL,
         ])) {
             throw new ValidationException(
-                "Field type is not valid (field type: {$this->fieldOptions['type']}).");
+                "Field type is not valid (field type: {$this->fieldOptions['type']})");
         }
         $this->fieldType = $fieldOptions['type'];
 
@@ -166,7 +166,7 @@ final class ValidationRule
                 if (isset($this->fieldOptions['encoding'])) {
                     if (!in_array($this->fieldOptions['encoding'], Validation::ENCODING)) {
                         throw new ValidationException(
-                            "Unimplemented encoding given (encoding: {$this->fieldOptions['encoding']}).");
+                            "Unimplemented encoding given (encoding: {$this->fieldOptions['encoding']})");
                     }
                     $this->fieldEncoding = $this->fieldOptions['encoding'];
                 }
@@ -187,7 +187,8 @@ final class ValidationRule
             $this->specType = gettype($this->spec);
 
             if ($this->specType != 'array' && $this->fieldType == Validation::TYPE_ENUM) {
-                throw new ValidationException("Wrong spec given, only an array accepted (field: {$this->fieldName}).");
+                throw new ValidationException(
+                    "Wrong spec given, only an array accepted (field: {$this->fieldName})");
             }
 
             // detect regexp spec
@@ -230,8 +231,8 @@ final class ValidationRule
         }
 
         // check fix limit
-        if ($this->isFixed && $this->limit === null && $this->limitMax === null) {
-            throw new ValidationException('Limit option is required if fixed option is set.');
+        if ($this->isFixed && !($this->limit !== null || $this->limitMax !== null)) {
+            throw new ValidationException('limit option is required if fixed option is set');
         }
     }
 
@@ -315,22 +316,22 @@ final class ValidationRule
 
                 // check limit(s)
                 if ($this->limit !== null) {
-                    $isLimitNumeric = is_numeric($this->limit);
+                    $isNumericLimit = is_numeric($this->limit);
                     // should truncate?
                     if ($this->isFixed) {
-                        $input = mb_substr($input, 0, intval($isLimitNumeric ? $this->limit : $this->limitMax));
+                        $input = mb_substr($input, 0, intval($isNumericLimit ? $this->limit : $this->limitMax));
                     }
 
-                    $inputLen = strlen($input);
-                    if ($isLimitNumeric && $inputLen !== $this->limit) {
+                    $inputLength = strlen($input);
+                    if ($isNumericLimit && $inputLength !== $this->limit) {
                         $this->fail = sprintf('%s value length must be %s.', $inputLabel, $this->limit);
                         return false;
                     }
-                    if ($this->limitMin !== null && $inputLen < $this->limitMin) {
+                    if ($this->limitMin !== null && $inputLength < $this->limitMin) {
                         $this->fail = sprintf('%s value minimum length could be %s.', $inputLabel, $this->limitMin);
                         return false;
                     }
-                    if ($this->limitMax !== null && $inputLen > $this->limitMax) {
+                    if ($this->limitMax !== null && $inputLength > $this->limitMax) {
                         $this->fail = sprintf('%s value maximum length could be %s.', $inputLabel, $this->limitMax);
                         return false;
                     }
