@@ -114,13 +114,13 @@ final class Validation
         foreach ($rules as $name => $rule) {
             // nested?
             if (is_array($rule)) {
-                foreach ($rule as $nRule) {
-                    $fieldName = $nRule->getFieldName();
+                foreach ($rule as $rule) {
+                    $fieldName = $rule->getFieldName();
                     @ $fieldValue = (string) $data[$name][$fieldName];
 
-                    // real check here sanitizing/overwriting input data
-                    if (!$nRule->ok($fieldValue)) {
-                        $fails[$name .'.'. $fieldName] = $nRule->getFail();
+                    // real check here sanitizing/overriding input data
+                    if (!$rule->ok($fieldValue)) {
+                        $fails[$name .'.'. $fieldName] = $rule->getFail();
                     }
 
                     // override
