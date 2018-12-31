@@ -84,7 +84,8 @@ final class Validation
      * @param  bool       $dropUndefs This will drop undefined data keys
      * @return bool
      */
-    public function validate(string $key, array &$data, array &$fails = null, bool $dropUndefs = true): bool
+    public function validate(string $key, array &$data, array &$fails = null,
+        bool $dropUndefs = true): bool
     {
         // no rule to validate
         if (!isset($this->rules[$key])) {
