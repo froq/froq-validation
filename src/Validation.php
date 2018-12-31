@@ -116,7 +116,7 @@ final class Validation
             if (is_array($rule)) {
                 foreach ($rule as $nRule) {
                     $fieldName = $nRule->getFieldName();
-                    $fieldValue =@ (string) $data[$name][$fieldName];
+                    @ $fieldValue = (string) $data[$name][$fieldName];
 
                     // real check here sanitizing/overwriting input data
                     if (!$nRule->ok($fieldValue)) {
@@ -128,7 +128,7 @@ final class Validation
                 }
             } else {
                 $fieldName = $rule->getFieldName();
-                $fieldValue =@ (string) $data[$fieldName];
+                @ $fieldValue = (string) $data[$fieldName];
 
                 // real check here sanitizing/overwriting input data
                 if (!$rule->ok($fieldValue)) {
