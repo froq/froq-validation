@@ -153,9 +153,9 @@ final class Validation
      * @note    This method could be used in "service::init" method
      * in order to set (override) its values after getting from db etc.
      * @param  array $rules
-     * @return self
+     * @return void
      */
-    public function setRules(array $rules): self
+    public function setRules(array $rules): void
     {
         foreach ($rules as $key => $fields) {
             foreach ($fields as $fieldName => $fieldOptions) {
@@ -177,8 +177,6 @@ final class Validation
                 }
             }
         }
-
-        return $this;
     }
 
     /**
@@ -193,17 +191,15 @@ final class Validation
     /**
      * Set fails.
      * @param  array $fails
-     * @return self
+     * @return void
      */
-    public function setFails(array $fails = null): self
+    public function setFails(array $fails = null): void
     {
         if (!empty($fails)) {
             foreach ($fails as $fieldName => $fail) {
                 $this->fails[$fieldName] = $fail;
             }
         }
-
-        return $this;
     }
 
     /**
