@@ -31,6 +31,7 @@ namespace Froq\Validation;
  * @subpackage Froq\Validation
  * @object     Froq\Validation\Validation
  * @author     Kerem Güneş <k-gun@mail.com>
+ * @since      1.0
  */
 final class Validation
 {
