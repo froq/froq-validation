@@ -72,9 +72,7 @@ final class Validation
      */
     public function __construct(array $rules = null)
     {
-        if ($rules != null) {
-            $this->setRules($rules);
-        }
+        $rules && $this->setRules($rules);
     }
 
     /**
