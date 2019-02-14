@@ -24,14 +24,14 @@
  */
 declare(strict_types=1);
 
-namespace Froq\Validation;
+namespace froq\validation;
 
 /**
- * @package    Froq
- * @subpackage Froq\Validation
- * @object     Froq\Validation\ValidationException
- * @author     Kerem Güneş <k-gun@mail.com>
- * @since      1.0
+ * Validation exception.
+ * @package froq\validation
+ * @object  froq\validation\ValidationException
+ * @author  Kerem Güneş <k-gun@mail.com>
+ * @since   1.0
  */
 final class ValidationException extends \Exception
 {}
