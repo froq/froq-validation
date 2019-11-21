@@ -1,8 +1,8 @@
 <?php
 /**
- * Copyright (c) 2015 Kerem Güneş
- *
  * MIT License <https://opensource.org/licenses/mit>
+ *
+ * Copyright (c) 2015 Kerem Güneş
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,16 @@
  */
 declare(strict_types=1);
 
-namespace Froq\Validation;
+namespace froq\validation;
+
+use froq\Exception;
 
 /**
- * @package    Froq
- * @subpackage Froq\Validation
- * @object     Froq\Validation\ValidationException
- * @author     Kerem Güneş <k-gun@mail.com>
+ * Validation Exception.
+ * @package froq\validation
+ * @object  froq\validation\ValidationException
+ * @author  Kerem Güneş <k-gun@mail.com>
+ * @since   1.0
  */
-final class ValidationException extends \Exception
+final class ValidationException extends Exception
 {}
