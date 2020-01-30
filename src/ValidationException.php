@@ -26,7 +26,7 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\Exception;
+use froq\common\Exception;
 
 /**
  * Validation Exception.
