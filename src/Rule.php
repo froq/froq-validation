@@ -234,7 +234,7 @@ final class Rule
                 if (isset($limit)) {
                     if (json_encode($input) <> json_encode($limit)) {
                         $this->toFail(RuleFail::NOT_EQUAL,
-                            sprintf('%s value could be only %s.', $inputLabel, $limit));
+                            sprintf('%s value must be only %s.', $inputLabel, $limit));
 
                         return false;
                     }
@@ -242,13 +242,13 @@ final class Rule
                     @ [$limitMin, $limitMax] = $limits;
                     if (isset($limitMin) && $input < $limitMin) {
                         $this->toFail(RuleFail::MINIMUM_VALUE,
-                            sprintf('%s value could be minimum %s.', $inputLabel, $limitMin));
+                            sprintf('%s value must be minimum %s.', $inputLabel, $limitMin));
 
                         return false;
                     }
                     if (isset($limitMax) && $input > $limitMax) {
                         $this->toFail(RuleFail::MAXIMUM_VALUE,
-                            sprintf('%s value could be maximum %s.', $inputLabel, $limitMax));
+                            sprintf('%s value must be maximum %s.', $inputLabel, $limitMax));
 
                         return false;
                     }
@@ -284,13 +284,13 @@ final class Rule
                     @ [$limitMin, $limitMax, $inputLength] = [...$limits, mb_strlen($input, $encoding)];
                     if (isset($limitMin) && $inputLength < $limitMin) {
                         $this->toFail(RuleFail::MINIMUM_LENGTH,
-                            sprintf('%s value minimum length could be %s.', $inputLabel, $limitMin));
+                            sprintf('%s value minimum length must be %s.', $inputLabel, $limitMin));
 
                         return false;
                     }
                     if (isset($limitMax) && $inputLength > $limitMax) {
                         $this->toFail(RuleFail::MAXIMUM_LENGTH,
-                            sprintf('%s value maximum length could be %s.', $inputLabel, $limitMax));
+                            sprintf('%s value maximum length must be %s.', $inputLabel, $limitMax));
 
                         return false;
                     }
@@ -300,7 +300,7 @@ final class Rule
             case Validation::TYPE_ENUM:
                 if (!in_array($input, $spec)) {
                     $this->toFail(RuleFail::NOT_FOUND,
-                        sprintf('%s value could be one of %s options.', $inputLabel, join(', ', $spec)));
+                        sprintf('%s value must be one of %s options.', $inputLabel, join(', ', $spec)));
 
                     return false;
                 }

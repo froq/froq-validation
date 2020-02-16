@@ -76,8 +76,8 @@ final class Validation
     /**
      * Set rules.
      *
-     * This method could be used in 'init' method in running service in order to
-     * set or reset its values after getting the rule set from DB etc.
+     * This method can be used in `init()` method in current controller in order to set or reset
+     * the rules after getting them from DB etc.
      *
      * @param  array $rules
      * @return void
