@@ -49,8 +49,12 @@ final class Validation
                  TYPE_ENUM     = 'enum',
                  TYPE_EMAIL    = 'email',
                  TYPE_DATE     = 'date',
+                 TYPE_TIME     = 'time',
                  TYPE_DATETIME = 'datetime',
-                 TYPE_URL      = 'url';
+                 TYPE_UNIXTIME = 'unixtime',
+                 TYPE_URL      = 'url',
+                 TYPE_UUID     = 'uuid',
+                 TYPE_JSON     = 'json';
 
     /**
      * Rules.
@@ -158,10 +162,10 @@ final class Validation
             if (is_array($rule)) {
                 foreach ($rule as $rule) {
                     $field = $rule->getField();
-                    $fieldValue = (string) ($data[$name][$field] ?? '');
+                    $fieldValue = $data[$name][$field] ?? null;
 
                     // Real check here sanitizing/overriding input data.
-                    if (!$rule->ok($fieldValue)) {
+                    if (!$rule->ok($fieldValue, $name)) {
                         $fails[$name .'.'. $field] = $rule->getFail();
                     }
 
@@ -170,10 +174,10 @@ final class Validation
                 }
             } else {
                 $field = $rule->getField();
-                $fieldValue = (string) ($data[$field] ?? '');
+                $fieldValue = $data[$field] ?? null;
 
                 // Real check here sanitizing/overriding input data.
-                if (!$rule->ok($fieldValue)) {
+                if (!$rule->ok($fieldValue, $field)) {
                     $fails[$field] = $rule->getFail();
                 }
 

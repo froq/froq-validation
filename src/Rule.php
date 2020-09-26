@@ -27,6 +27,7 @@ declare(strict_types=1);
 namespace froq\validation;
 
 use froq\validation\{Validation, ValidationException, RuleFail};
+use Closure;
 
 /**
  * Rule.
@@ -51,9 +52,9 @@ final class Rule
 
     /**
      * Fail.
-     * @var array<int, string>|null
+     * @var ?array<int, string>
      */
-    private array $fail;
+    private ?array $fail = null;
 
     /**
      * Constructor.
@@ -70,19 +71,16 @@ final class Rule
         }
 
         static $availableTypes = [
-            Validation::TYPE_INT,    Validation::TYPE_FLOAT, Validation::TYPE_NUMERIC,
-            Validation::TYPE_STRING, Validation::TYPE_BOOL,  Validation::TYPE_ENUM,
-            Validation::TYPE_EMAIL,  Validation::TYPE_DATE,  Validation::TYPE_DATETIME,
-            Validation::TYPE_URL
+            Validation::TYPE_INT,      Validation::TYPE_FLOAT,    Validation::TYPE_NUMERIC,
+            Validation::TYPE_STRING,   Validation::TYPE_BOOL,     Validation::TYPE_ENUM,
+            Validation::TYPE_EMAIL,    Validation::TYPE_DATE,     Validation::TYPE_TIME,
+            Validation::TYPE_DATETIME, Validation::TYPE_UNIXTIME,
+            Validation::TYPE_URL,      Validation::TYPE_UUID,     Validation::TYPE_JSON
         ];
 
         @ ['type' => $type, 'spec' => $spec] = $fieldOptions;
 
-        if ($type == null) {
-            throw new ValidationException(sprintf(
-                'Field "type" is not set in validation rules (field: %s)', $field
-            ));
-        } elseif (!in_array($type, $availableTypes)) {
+        if ($type && !in_array($type, $availableTypes)) {
             throw new ValidationException(sprintf(
                 'Field "type" is not valid (field type: %s, available types: %s',
                 $type, join(', ', $availableTypes)
@@ -101,11 +99,17 @@ final class Rule
                         $field
                     ));
                 }
+                break;
         }
 
         // Set spec type.
         if ($spec != null) {
-            if (is_callable($spec)) {
+            if ($type == Validation::TYPE_JSON && !in_array($spec, ['array', 'object'])) {
+                throw new ValidationException(sprintf(
+                    'Invalid spec given, only "array" and "object" accepted for json types (field: %s)',
+                    $field
+                ));
+            } elseif ($spec instanceof Closure) {
                 $fieldOptions['specType'] = 'callback';
             } else {
                 $fieldOptions['specType'] = gettype($spec);
@@ -114,7 +118,7 @@ final class Rule
                     $type, [Validation::TYPE_BOOL, Validation::TYPE_ENUM]
                 )) {
                     throw new ValidationException(sprintf(
-                        'Invalid spec given, only an array accepted for enum types (field: %s)',
+                        'Invalid spec given, only an array accepted for bool and enum types (field: %s)',
                         $field
                     ));
                 }
@@ -153,18 +157,19 @@ final class Rule
      * @return bool
      * @throws froq\validation\ValidationException
      */
-    public function ok(&$input): bool
+    public function ok(&$input, string $inputLabel = null): bool
     {
-        if (!is_scalar($input)) {
-            throw new ValidationException('Only scalar types accepted for validation');
+        if (isset($input) && !is_scalar($input)) {
+            throw new ValidationException('Only scalar types accepted for validation, "%s" given',
+                [gettype($input)]);
         }
 
         @ ['type' => $type, 'label' => $label, 'default' => $default,
            'limit' => $limit, 'limits' => $limits, 'spec' => $spec, 'specType' => $specType,
            'required' => $required, 'unsigned' => $unsigned, 'fixed' => $fixed] = $this->fieldOptions;
 
-        $input = trim((string) $input);
-        $inputLabel = trim($label ?? 'Field');
+        $input = is_string($input) ? trim($input) : $input;
+        $inputLabel = trim($label ?? $inputLabel ?? 'Field');
 
         // Callback spec overrides all rules.
         if ($specType == 'callback') {
@@ -173,7 +178,7 @@ final class Rule
 
             if ($spec($input, $fail) === false) {
                 $code = RuleFail::CALLBACK;
-                $message = 'Callback returned false.';
+                $message = sprintf('Callback returned false for "%s".', $inputLabel);
 
                 if (is_string($fail)) {
                     $message = $fail;
@@ -190,7 +195,7 @@ final class Rule
         }
 
         // Check required issue.
-        if ($input === '' && $required) {
+        if ($required && ($input === '' || $input === null)) {
             $this->toFail(RuleFail::REQUIRED, sprintf('%s is required.', $inputLabel));
 
             return false;
@@ -202,12 +207,20 @@ final class Rule
         }
 
         // Skip if null given as default that also checks given default.
-        if ($input === null && !$required) {
+        if (!$required && $input === null) {
             return true;
         }
 
         // Validate by type.
         switch ($type) {
+            case Validation::TYPE_ENUM:
+                if (!in_array($input, $spec, true)) {
+                    $this->toFail(RuleFail::NOT_FOUND,
+                        sprintf('%s value must be one of %s options.', $inputLabel, join(', ', $spec)));
+
+                    return false;
+                }
+                break;
             case Validation::TYPE_INT:
             case Validation::TYPE_FLOAT:
             case Validation::TYPE_NUMERIC:
@@ -297,8 +310,7 @@ final class Rule
                 }
                 break;
             case Validation::TYPE_BOOL:
-            case Validation::TYPE_ENUM:
-                if (!in_array($input, $spec)) {
+                if (!in_array($input, $spec, true)) {
                     $this->toFail(RuleFail::NOT_FOUND,
                         sprintf('%s value must be one of %s options.', $inputLabel, join(', ', $spec)));
 
@@ -321,6 +333,7 @@ final class Rule
                 }
                 break;
             case Validation::TYPE_DATE:
+            case Validation::TYPE_TIME:
             case Validation::TYPE_DATETIME:
                 if ($specType == 'regexp' && !preg_match($spec, $input)) {
                     $this->toFail(RuleFail::NOT_MATCH,
@@ -329,9 +342,19 @@ final class Rule
                     return false;
                 }
 
-                if ($input != date($spec, strtotime($input))) {
+                $date = date_create_from_format($spec, $input);
+                if (!$date || $date->format($spec) !== $input) {
                     $this->toFail(RuleFail::NOT_VALID,
-                        sprintf('%s value is not a valid date/datetime.', $inputLabel));
+                        sprintf('%s value is not a valid date/time/datetime.', $inputLabel));
+
+                    return false;
+                }
+                break;
+            case Validation::TYPE_UNIXTIME:
+                $inputString = (string) $input;
+                if (!ctype_digit($inputString) || strlen($inputString) != strlen((string) time())) {
+                    $this->toFail(RuleFail::NOT_VALID,
+                        sprintf('%s value is not a valid unixtime.', $inputLabel));
 
                     return false;
                 }
@@ -363,6 +386,34 @@ final class Rule
                     return false;
                 }
                 break;
+            case Validation::TYPE_UUID:
+                $dash = $this->fieldOptions['dash'] ?? true;
+                if (!$dash ? !preg_match('~^[a-f0-9]{32}$~', $input)
+                           : !preg_match('~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~', $input)
+                ) {
+                    $this->toFail(RuleFail::NOT_VALID,
+                        sprintf('%s value is not a valid UUID.', $inputLabel));
+
+                    return false;
+                }
+                break;
+            case Validation::TYPE_JSON:
+                // Validates JSON array/object inputs only.
+                if ($spec) {
+                    $chars = ($input[0] ?? '') . ($input[-1] ?? '');
+                    if ($spec == 'array' && $chars !== '[]') {
+                        $this->toFail(RuleFail::NOT_VALID,
+                            sprintf('%s value is not a valid JSON array.', $inputLabel));
+
+                        return false;
+                    } elseif ($spec == 'object' && $chars !== '{}') {
+                        $this->toFail(RuleFail::NOT_VALID,
+                            sprintf('%s value is not a valid JSON object.', $inputLabel));
+
+                        return false;
+                    }
+                }
+                break;
         }
 
         // Seems all OK.
@@ -389,9 +440,9 @@ final class Rule
 
     /**
      * Get fail.
-     * @return array
+     * @return ?array
      */
-    public function getFail(): array
+    public function getFail(): ?array
     {
         return $this->fail;
     }
