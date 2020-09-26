@@ -153,7 +153,8 @@ final class Rule
 
     /**
      * Validate.
-     * @param  scalar &$input
+     * @param  scalar      &$input
+     * @param  string|null  $inputLabel
      * @return bool
      * @throws froq\validation\ValidationException
      */
@@ -169,7 +170,7 @@ final class Rule
            'required' => $required, 'unsigned' => $unsigned, 'fixed' => $fixed] = $this->fieldOptions;
 
         $input = is_string($input) ? trim($input) : $input;
-        $inputLabel = trim($label ?? $inputLabel ?? 'Field');
+        $inputLabel = trim($label ?? ($inputLabel ? 'Field "'. $inputLabel .'"' : 'Field'));
 
         // Callback spec overrides all rules.
         if ($specType == 'callback') {

@@ -26,7 +26,8 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\validation\Rule;
+use froq\common\traits\OptionTrait;
+use froq\validation\{ValidationException, Rule};
 
 /**
  * Validation.
@@ -37,6 +38,13 @@ use froq\validation\Rule;
  */
 final class Validation
 {
+    /**
+     * Option trait.
+     * @see froq\common\traits\OptionTrait
+     * @since 4.2
+     */
+    use OptionTrait;
+
     /**
      * Types.
      * @const string
@@ -69,12 +77,27 @@ final class Validation
     private array $fails = [];
 
     /**
+     * Options default.
+     * @var array
+     * @since 4.2
+     */
+    private static array $optionsDefault = [
+        'exceptionMode' => false,
+        'useFieldNamesAsLabel' => true,
+    ];
+
+    /**
      * Constructor.
      * @param array|null $rules
+     * @param array|null $options
      */
-    public function __construct(array $rules = null)
+    public function __construct(array $rules = null, array $options = null)
     {
         $rules && $this->setRules($rules);
+
+        $options = array_merge(self::$optionsDefault, $options ?? []);
+
+        $this->setOptions($options);
     }
 
     /**
@@ -157,28 +180,41 @@ final class Validation
             }
         }
 
+        [$exceptionMode, $useFieldNamesAsLabel]
+            = $this->getOptions(['exceptionMode', 'useFieldNamesAsLabel']);
+
         foreach ($rules as $name => $rule) {
             // Nested?
             if (is_array($rule)) {
                 foreach ($rule as $rule) {
                     $field = $rule->getField();
                     $fieldValue = $data[$name][$field] ?? null;
+                    $fieldLabel = $useFieldNamesAsLabel ? $name .'.'. $field : null;
 
                     // Real check here sanitizing/overriding input data.
-                    if (!$rule->ok($fieldValue, $name)) {
-                        $fails[$name .'.'. $field] = $rule->getFail();
+                    if (!$rule->ok($fieldValue, $fieldLabel)) {
+                        $fail = $rule->getFail();
+                        if ($exceptionMode) {
+                            throw new ValidationException($fail['message'], $fail['code']);
+                        }
+                        $fails[$name .'.'. $field] = $fail;
                     }
 
                     // @override
                     $data[$name][$field] = $fieldValue;
                 }
             } else {
-                $field = $rule->getField();
+                $field      = $rule->getField();
                 $fieldValue = $data[$field] ?? null;
+                $fieldLabel = $useFieldNamesAsLabel ? $field : null;
 
                 // Real check here sanitizing/overriding input data.
-                if (!$rule->ok($fieldValue, $field)) {
-                    $fails[$field] = $rule->getFail();
+                if (!$rule->ok($fieldValue, $fieldLabel)) {
+                    $fail = $rule->getFail();
+                    if ($exceptionMode) {
+                        throw new ValidationException($fail['message'], $fail['code']);
+                    }
+                    $fails[$field] = $fail;
                 }
 
                 // @override
