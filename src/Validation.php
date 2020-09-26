@@ -124,13 +124,13 @@ final class Validation
     /**
      * Validate.
      * @param  string      $key
-     * @param  array      &$data              This will override modifiying input data.
-     * @param  array|null &$fails             Shortcut for call getFails().
-     * @param  bool        $dropUndefinedKeys This will drop undefined data keys.
+     * @param  array      &$data                This will override modifiying input data.
+     * @param  array|null &$fails               Shortcut for call getFails().
+     * @param  bool        $dropUndefinedFields This will drop undefined data keys.
      * @return bool
      */
     public function validate(string $key, array &$data, array &$fails = null,
-        bool $dropUndefinedKeys = true): bool
+        bool $dropUndefinedFields = true): bool
     {
         // No rule to validate.
         if (empty($this->rules[$key])) {
@@ -142,7 +142,7 @@ final class Validation
         $ruleKeys = array_keys($rules);
 
         // Drop undefined data keys.
-        if ($dropUndefinedKeys) {
+        if ($dropUndefinedFields) {
             foreach ($data as $key => $value) {
                 if (!in_array($key, $ruleKeys)) {
                     unset($data[$key]);
