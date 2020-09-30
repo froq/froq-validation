@@ -160,14 +160,20 @@ final class Rule
      */
     public function ok(&$input, string $inputLabel = null): bool
     {
+        @ ['type' => $type, 'label' => $label, 'default' => $default,
+           'limit' => $limit, 'limits' => $limits, 'spec' => $spec, 'specType' => $specType,
+           'required' => $required, 'unsigned' => $unsigned, 'fixed' => $fixed, 'filter' => $filter,
+          ] = $this->fieldOptions;
+
+        // Apply filter first if provided.
+        if ($filter && is_callable($filter)) {
+            $input = $filter($input);
+        }
+
         if (isset($input) && !is_scalar($input)) {
             throw new ValidationException('Only scalar types accepted for validation, "%s" given',
                 [gettype($input)]);
         }
-
-        @ ['type' => $type, 'label' => $label, 'default' => $default,
-           'limit' => $limit, 'limits' => $limits, 'spec' => $spec, 'specType' => $specType,
-           'required' => $required, 'unsigned' => $unsigned, 'fixed' => $fixed] = $this->fieldOptions;
 
         $input = is_string($input) ? trim($input) : $input;
         $inputLabel = trim($label ?? ($inputLabel ? 'Field "'. $inputLabel .'"' : 'Field'));
