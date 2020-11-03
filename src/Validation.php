@@ -82,7 +82,8 @@ final class Validation
      * @since 4.2
      */
     private static array $optionsDefault = [
-        'exceptionMode' => false,
+        'exceptionMode'        => false,
+        'dropUndefinedFields'  => true,
         'useFieldNamesAsLabel' => true,
     ];
 
@@ -149,11 +150,11 @@ final class Validation
      * @param  string      $key
      * @param  array      &$data                This will override modifiying input data.
      * @param  array|null &$fails               Shortcut for call getFails().
-     * @param  bool        $dropUndefinedFields This will drop undefined data keys.
+     * @param  bool|null   $dropUndefinedFields This will drop undefined data keys.
      * @return bool
      */
     public function validate(string $key, array &$data, array &$fails = null,
-        bool $dropUndefinedFields = true): bool
+        bool $dropUndefinedFields = null): bool
     {
         // No rule to validate.
         if (empty($this->rules[$key])) {
@@ -165,6 +166,7 @@ final class Validation
         $ruleKeys = array_keys($rules);
 
         // Drop undefined data keys.
+        $dropUndefinedFields ??= $this->getOption('dropUndefinedFields');
         if ($dropUndefinedFields) {
             foreach ($data as $key => $value) {
                 if (!in_array($key, $ruleKeys)) {
