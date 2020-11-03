@@ -29,12 +29,12 @@ namespace froq\validation;
 /**
  * Rule Fail.
  * @package froq\validation
- * @object  froq\validation\RuleFail
+ * @object  froq\validation\Failure
  * @author  Kerem Güneş <k-gun@mail.com>
- * @since   4.0
+ * @since   4.0, 4.3 Renamed from RuleFail.
  * @static
  */
-final class RuleFail
+final class Failure
 {
     /**
      * Failures.

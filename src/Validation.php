@@ -27,7 +27,7 @@ declare(strict_types=1);
 namespace froq\validation;
 
 use froq\common\traits\OptionTrait;
-use froq\validation\{ValidationException, Rule};
+use froq\validation\{ValidationException, Rule, Rules};
 
 /**
  * Validation.
@@ -60,9 +60,9 @@ final class Validation
                  TYPE_TIME     = 'time',
                  TYPE_DATETIME = 'datetime',
                  TYPE_UNIXTIME = 'unixtime',
+                 TYPE_JSON     = 'json',
                  TYPE_URL      = 'url',
-                 TYPE_UUID     = 'uuid',
-                 TYPE_JSON     = 'json';
+                 TYPE_UUID     = 'uuid';
 
     /**
      * Rules.
@@ -112,17 +112,21 @@ final class Validation
      */
     public function setRules(array $rules): void
     {
-        foreach ($rules as $key => $fields) {
-            foreach ($fields as $field => $fieldOptions) {
-                // Nested (eg: [user => [image => [fields => [id => [type => string], url => [type => url], ...]]]]).
-                if (isset($fieldOptions['fields'])) {
-                    foreach ((array) $fieldOptions['fields'] as $fieldField => $fieldFieldOptions) {
-                        $this->rules[$key][$field][$fieldField] = new Rule($fieldField, $fieldFieldOptions);
-                    }
-                } else {
-                    // Regular (eg: [user => [id => [type => string], url => [type => url]]]).
-                    $this->rules[$key][$field] = new Rule($field, $fieldOptions);
+        foreach ($rules as $key => $rule) {
+            // Nested (eg: [user => [image => [fields => [id => [type => string], url => [type => url], ..]]]]).
+            if (isset($rule['fields'])) {
+                if (empty($rule['fields'])) {
+                    throw new ValidationException('Rule "fields" must be a non-empty array');
+                } elseif (!is_array($rule['fields'])) {
+                    throw new ValidationException('Rule "fields" must be an array, "%s" given',
+                        [gettype($rule)]);
                 }
+
+                $this->rules[$key] = new Rules($rule['fields']);
+            }
+            // Simple (eg: [image => [id => [type => string], url => [type => url], ..]]).
+            else {
+                $this->rules[$key] = new Rule($key, $rule);
             }
         }
     }
@@ -147,22 +151,19 @@ final class Validation
 
     /**
      * Validate.
-     * @param  string      $key
      * @param  array      &$data                This will override modifiying input data.
      * @param  array|null &$fails               Shortcut for call getFails().
      * @param  bool|null   $dropUndefinedFields This will drop undefined data keys.
      * @return bool
      */
-    public function validate(string $key, array &$data, array &$fails = null,
-        bool $dropUndefinedFields = null): bool
+    public function validate(array &$data, array &$fails = null, bool $dropUndefinedFields = null): bool
     {
-        // No rule to validate.
-        if (empty($this->rules[$key])) {
-            return true;
+        if (empty($this->rules)) {
+            throw new ValidationException('No rules to validate');
         }
 
         // Get rules.
-        $rules = $this->rules[$key];
+        $rules = $this->rules;
         $ruleKeys = array_keys($rules);
 
         // Drop undefined data keys.
@@ -185,13 +186,13 @@ final class Validation
         [$exceptionMode, $useFieldNamesAsLabel]
             = $this->getOptions(['exceptionMode', 'useFieldNamesAsLabel']);
 
-        foreach ($rules as $name => $rule) {
-            // Nested?
-            if (is_array($rule)) {
-                foreach ($rule as $rule) {
+        foreach ($rules as $key => $rule) {
+            // Nested.
+            if ($rule instanceof Rules) {
+                foreach ((array) $rule as $rule) {
                     $field = $rule->getField();
-                    $fieldValue = $data[$name][$field] ?? null;
-                    $fieldLabel = $useFieldNamesAsLabel ? $name .'.'. $field : null;
+                    $fieldValue = $data[$key][$field] ?? null;
+                    $fieldLabel = $useFieldNamesAsLabel ? $key .'.'. $field : null;
 
                     // Real check here sanitizing/overriding input data.
                     if (!$rule->ok($fieldValue, $fieldLabel)) {
@@ -199,13 +200,15 @@ final class Validation
                         if ($exceptionMode) {
                             throw new ValidationException($fail['message'], $fail['code']);
                         }
-                        $fails[$name .'.'. $field] = $fail;
+                        $fails[$key .'.'. $field] = $fail;
                     }
 
                     // @override
-                    $data[$name][$field] = $fieldValue;
+                    $data[$key][$field] = $fieldValue;
                 }
-            } else {
+            }
+            // Simple.
+            elseif ($rule instanceof Rule) {
                 $field      = $rule->getField();
                 $fieldValue = $data[$field] ?? null;
                 $fieldLabel = $useFieldNamesAsLabel ? $field : null;

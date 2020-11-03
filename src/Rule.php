@@ -26,7 +26,7 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\validation\{Validation, ValidationException, RuleFail};
+use froq\validation\{Validation, ValidationException, Failure};
 use Closure;
 
 /**
@@ -74,8 +74,8 @@ final class Rule
             Validation::TYPE_INT,      Validation::TYPE_FLOAT,    Validation::TYPE_NUMERIC,
             Validation::TYPE_STRING,   Validation::TYPE_BOOL,     Validation::TYPE_ENUM,
             Validation::TYPE_EMAIL,    Validation::TYPE_DATE,     Validation::TYPE_TIME,
-            Validation::TYPE_DATETIME, Validation::TYPE_UNIXTIME,
-            Validation::TYPE_URL,      Validation::TYPE_UUID,     Validation::TYPE_JSON
+            Validation::TYPE_DATETIME, Validation::TYPE_UNIXTIME, Validation::TYPE_JSON,
+            Validation::TYPE_URL,      Validation::TYPE_UUID
         ];
 
         @ ['type' => $type, 'spec' => $spec] = $fieldOptions;
@@ -184,7 +184,7 @@ final class Rule
             $fail = null;
 
             if ($spec($input, $fail) === false) {
-                $code = RuleFail::CALLBACK;
+                $code = Failure::CALLBACK;
                 $message = sprintf('Callback returned false for "%s".', $inputLabel);
 
                 if (is_string($fail)) {
@@ -203,7 +203,7 @@ final class Rule
 
         // Check required issue.
         if ($required && ($input === '' || $input === null)) {
-            $this->toFail(RuleFail::REQUIRED, sprintf('%s is required.', $inputLabel));
+            $this->toFail(Failure::REQUIRED, sprintf('%s is required.', $inputLabel));
 
             return false;
         }
@@ -222,7 +222,7 @@ final class Rule
         switch ($type) {
             case Validation::TYPE_ENUM:
                 if (!in_array($input, $spec, true)) {
-                    $this->toFail(RuleFail::NOT_FOUND,
+                    $this->toFail(Failure::NOT_FOUND,
                         sprintf('%s value must be one of %s options.', $inputLabel, join(', ', $spec)));
 
                     return false;
@@ -232,7 +232,7 @@ final class Rule
             case Validation::TYPE_FLOAT:
             case Validation::TYPE_NUMERIC:
                 if (!is_numeric($input)) {
-                    $this->toFail(RuleFail::TYPE,
+                    $this->toFail(Failure::TYPE,
                         sprintf('%s value must be type of %s.', $inputLabel, $type));
 
                     return false;
@@ -253,7 +253,7 @@ final class Rule
                 // Check limit(s).
                 if (isset($limit)) {
                     if (json_encode($input) <> json_encode($limit)) {
-                        $this->toFail(RuleFail::NOT_EQUAL,
+                        $this->toFail(Failure::NOT_EQUAL,
                             sprintf('%s value must be only %s.', $inputLabel, $limit));
 
                         return false;
@@ -261,13 +261,13 @@ final class Rule
                 } elseif (isset($limits)) {
                     @ [$limitMin, $limitMax] = $limits;
                     if (isset($limitMin) && $input < $limitMin) {
-                        $this->toFail(RuleFail::MINIMUM_VALUE,
+                        $this->toFail(Failure::MINIMUM_VALUE,
                             sprintf('%s value must be minimum %s.', $inputLabel, $limitMin));
 
                         return false;
                     }
                     if (isset($limitMax) && $input > $limitMax) {
-                        $this->toFail(RuleFail::MAXIMUM_VALUE,
+                        $this->toFail(Failure::MAXIMUM_VALUE,
                             sprintf('%s value must be maximum %s.', $inputLabel, $limitMax));
 
                         return false;
@@ -277,7 +277,7 @@ final class Rule
             case Validation::TYPE_STRING:
                 // Check regexp if provided.
                 if ($specType == 'regexp' && !preg_match($spec, $input)) {
-                    $this->toFail(RuleFail::NOT_MATCH,
+                    $this->toFail(Failure::NOT_MATCH,
                         sprintf('%s value did not match with given pattern.', $inputLabel));
 
                     return false;
@@ -295,7 +295,7 @@ final class Rule
                 if (isset($limit)) {
                     $inputLength = mb_strlen($input, $encoding);
                     if ($inputLength <> $limit) {
-                        $this->toFail(RuleFail::LENGTH,
+                        $this->toFail(Failure::LENGTH,
                             sprintf('%s value length must be %s.', $inputLabel, $limit));
 
                         return false;
@@ -303,13 +303,13 @@ final class Rule
                 } elseif (isset($limits)) {
                     @ [$limitMin, $limitMax, $inputLength] = [...$limits, mb_strlen($input, $encoding)];
                     if (isset($limitMin) && $inputLength < $limitMin) {
-                        $this->toFail(RuleFail::MINIMUM_LENGTH,
+                        $this->toFail(Failure::MINIMUM_LENGTH,
                             sprintf('%s value minimum length must be %s.', $inputLabel, $limitMin));
 
                         return false;
                     }
                     if (isset($limitMax) && $inputLength > $limitMax) {
-                        $this->toFail(RuleFail::MAXIMUM_LENGTH,
+                        $this->toFail(Failure::MAXIMUM_LENGTH,
                             sprintf('%s value maximum length must be %s.', $inputLabel, $limitMax));
 
                         return false;
@@ -318,7 +318,7 @@ final class Rule
                 break;
             case Validation::TYPE_BOOL:
                 if (!in_array($input, $spec, true)) {
-                    $this->toFail(RuleFail::NOT_FOUND,
+                    $this->toFail(Failure::NOT_FOUND,
                         sprintf('%s value must be one of %s options.', $inputLabel, join(', ', $spec)));
 
                     return false;
@@ -326,14 +326,14 @@ final class Rule
                 break;
             case Validation::TYPE_EMAIL:
                 if ($specType == 'regexp' && !preg_match($spec, $input)) {
-                    $this->toFail(RuleFail::NOT_MATCH,
+                    $this->toFail(Failure::NOT_MATCH,
                         sprintf('%s value did not match with given pattern.', $inputLabel));
 
                     return false;
                 }
 
                 if (!filter_var($input, FILTER_VALIDATE_EMAIL)) {
-                    $this->toFail(RuleFail::EMAIL,
+                    $this->toFail(Failure::EMAIL,
                         sprintf('%s value must be a valid email address.', $inputLabel));
 
                     return false;
@@ -343,7 +343,7 @@ final class Rule
             case Validation::TYPE_TIME:
             case Validation::TYPE_DATETIME:
                 if ($specType == 'regexp' && !preg_match($spec, $input)) {
-                    $this->toFail(RuleFail::NOT_MATCH,
+                    $this->toFail(Failure::NOT_MATCH,
                         sprintf('%s value did not match with given pattern.', $inputLabel));
 
                     return false;
@@ -351,7 +351,7 @@ final class Rule
 
                 $date = date_create_from_format($spec, $input);
                 if (!$date || $date->format($spec) !== $input) {
-                    $this->toFail(RuleFail::NOT_VALID,
+                    $this->toFail(Failure::NOT_VALID,
                         sprintf('%s value is not a valid date/time/datetime.', $inputLabel));
 
                     return false;
@@ -360,7 +360,7 @@ final class Rule
             case Validation::TYPE_UNIXTIME:
                 $inputString = (string) $input;
                 if (!ctype_digit($inputString) || strlen($inputString) != strlen((string) time())) {
-                    $this->toFail(RuleFail::NOT_VALID,
+                    $this->toFail(Failure::NOT_VALID,
                         sprintf('%s value is not a valid unixtime.', $inputLabel));
 
                     return false;
@@ -368,7 +368,7 @@ final class Rule
                 break;
             case Validation::TYPE_URL:
                 if ($specType == 'regexp' && !preg_match($spec, $input)) {
-                    $this->toFail(RuleFail::NOT_MATCH,
+                    $this->toFail(Failure::NOT_MATCH,
                         sprintf('%s value did not match with given pattern.', $inputLabel));
 
                     return false;
@@ -380,14 +380,14 @@ final class Rule
 
                     $missingComponents = array_diff($spec, array_keys($url));
                     if ($missingComponents != null) {
-                        $this->toFail(RuleFail::NOT_VALID,
+                        $this->toFail(Failure::NOT_VALID,
                             sprintf('%s value is not a valid URL (missing components: %s).',
                                 $inputLabel, join(', ', $missingComponents)));
 
                         return false;
                     }
                 } elseif (!filter_var($input, FILTER_VALIDATE_URL)) {
-                    $this->toFail(RuleFail::NOT_VALID,
+                    $this->toFail(Failure::NOT_VALID,
                         sprintf('%s value is not a valid URL.', $inputLabel));
 
                     return false;
@@ -398,7 +398,7 @@ final class Rule
                 if (!$dash ? !preg_match('~^[a-f0-9]{32}$~', $input)
                            : !preg_match('~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~', $input)
                 ) {
-                    $this->toFail(RuleFail::NOT_VALID,
+                    $this->toFail(Failure::NOT_VALID,
                         sprintf('%s value is not a valid UUID.', $inputLabel));
 
                     return false;
@@ -409,12 +409,12 @@ final class Rule
                 if ($spec) {
                     $chars = ($input[0] ?? '') . ($input[-1] ?? '');
                     if ($spec == 'array' && $chars !== '[]') {
-                        $this->toFail(RuleFail::NOT_VALID,
+                        $this->toFail(Failure::NOT_VALID,
                             sprintf('%s value is not a valid JSON array.', $inputLabel));
 
                         return false;
                     } elseif ($spec == 'object' && $chars !== '{}') {
-                        $this->toFail(RuleFail::NOT_VALID,
+                        $this->toFail(Failure::NOT_VALID,
                             sprintf('%s value is not a valid JSON object.', $inputLabel));
 
                         return false;
