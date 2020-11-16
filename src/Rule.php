@@ -130,7 +130,7 @@ final class Rule
             }
         }
 
-        // Set other rules (eg: [foo => [type => int, ... [required, ...]]]).
+        // Set other rules (eg: [foo => [type => int, ..., required, ...]]).
         foreach ($fieldOptions as $key => $value) {
             if (is_int($key)) {
                 // Drop used and non-valid items.
