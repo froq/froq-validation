@@ -285,10 +285,9 @@ final class Rule
 
                 $encoding = $this->fieldOptions['encoding'] ?? mb_internal_encoding();
 
-                // This will pass checks below if 'fixed' option provided.
+                // Make fixed.
                 if ($fixed) {
-                    $input = mb_substr($input, 0, intval($limit), $encoding);
-                    return true;
+                    $input = mb_substr($input, 0, intval($limit ?? mb_strlen($input, $encoding)), $encoding);
                 }
 
                 // Check limit(s).
