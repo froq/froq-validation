@@ -27,8 +27,7 @@ final class Rules
     {
         foreach ($rules as $field => $fieldOptions) {
             if (!is_string($field)) {
-                throw new ValidationException('Field name must a string, "%s" given',
-                    [gettype($field)]);
+                throw new ValidationException("Field name must a string, '%s' given", gettype($field));
             }
 
             // Simply set rules with keys as property.

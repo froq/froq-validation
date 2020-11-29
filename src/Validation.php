@@ -97,10 +97,9 @@ final class Validation
             // Nested (eg: [user => [image => [fields => [id => [type => string], url => [type => url], ..]]]]).
             if (isset($rule['fields'])) {
                 if (empty($rule['fields'])) {
-                    throw new ValidationException('Rule "fields" must be a non-empty array');
+                    throw new ValidationException("Rule 'fields' must be a non-empty array");
                 } elseif (!is_array($rule['fields'])) {
-                    throw new ValidationException('Rule "fields" must be an array, "%s" given',
-                        [gettype($rule)]);
+                    throw new ValidationException("Rule 'fields' must be an array, '%s' given", gettype($rule));
                 }
 
                 $this->rules[$key] = new Rules($rule['fields']);
@@ -173,7 +172,7 @@ final class Validation
                 foreach ((array) $rule as $rule) {
                     $field = $rule->getField();
                     $fieldValue = $data[$key][$field] ?? null;
-                    $fieldLabel = $useFieldNamesAsLabel ? $key .'.'. $field : null;
+                    $fieldLabel = $useFieldNamesAsLabel ? $key . '.' . $field : null;
 
                     // Real check here sanitizing/overriding input data.
                     if (!$rule->ok($fieldValue, $fieldLabel)) {
@@ -181,7 +180,7 @@ final class Validation
                         if ($exceptionMode) {
                             throw new ValidationException($fail['message'], $fail['code']);
                         }
-                        $fails[$key .'.'. $field] = $fail;
+                        $fails[$key . '.' . $field] = $fail;
                     }
 
                     // @override

@@ -46,10 +46,10 @@ final class Rule
     public function __construct(string $field, array $fieldOptions)
     {
         if (empty($field)) {
-            throw new ValidationException('Field name should not be empty');
+            throw new ValidationException('Field name must not be empty');
         }
         if (empty($fieldOptions)) {
-            throw new ValidationException('Field options should not be empty');
+            throw new ValidationException('Field options must not be empty');
         }
 
         static $availableTypes = [
@@ -63,10 +63,8 @@ final class Rule
         @ ['type' => $type, 'spec' => $spec] = $fieldOptions;
 
         if ($type && !in_array($type, $availableTypes)) {
-            throw new ValidationException(sprintf(
-                'Field "type" is not valid (field type: %s, available types: %s',
-                $type, join(', ', $availableTypes)
-            ));
+            throw new ValidationException("Field 'type' is not valid (field type: %s, available types: %s",
+                [$type, join(', ', $availableTypes)]);
         }
 
         // Check spec stuff.
@@ -76,10 +74,8 @@ final class Rule
             case Validation::TYPE_DATE:
             case Validation::TYPE_DATETIME:
                 if ($spec == null) {
-                    throw new ValidationException(sprintf(
-                        'Enum, bool, date and datetime types require "spec" definition (field: %s)',
-                        $field
-                    ));
+                    throw new ValidationException("Enum, bool, date and datetime types require 'spec' definition "
+                        . "(field: %s)", $field);
                 }
                 break;
         }
@@ -87,10 +83,8 @@ final class Rule
         // Set spec type.
         if ($spec != null) {
             if ($type == Validation::TYPE_JSON && !in_array($spec, ['array', 'object'])) {
-                throw new ValidationException(sprintf(
-                    'Invalid spec given, only "array" and "object" accepted for json types (field: %s)',
-                    $field
-                ));
+                throw new ValidationException("Invalid spec given, only 'array' and 'object' accepted for json "
+                    . "types (field: %s)", $field);
             } elseif ($spec instanceof Closure) {
                 $fieldOptions['specType'] = 'callback';
             } else {
@@ -99,10 +93,8 @@ final class Rule
                 if ($fieldOptions['specType'] != 'array' && in_array(
                     $type, [Validation::TYPE_BOOL, Validation::TYPE_ENUM]
                 )) {
-                    throw new ValidationException(sprintf(
-                        'Invalid spec given, only an array accepted for bool and enum types (field: %s)',
-                        $field
-                    ));
+                    throw new ValidationException("Invalid spec given, only an array accepted for bool and enum "
+                        . "types (field: %s)", $field);
                 }
 
                 // Detect regexp spec.
@@ -126,7 +118,7 @@ final class Rule
 
         // Check fixed limit.
         if (isset($fieldOptions['fixed']) && !isset($fieldOptions['limit'])) {
-            throw new ValidationException('Option "limit" should not be empty when option "fixed" given');
+            throw new ValidationException("Option 'limit' must not be empty when option 'fixed' given");
         }
 
         $this->field = $field;
@@ -153,12 +145,11 @@ final class Rule
         }
 
         if (isset($input) && !is_scalar($input)) {
-            throw new ValidationException('Only scalar types accepted for validation, "%s" given',
-                [gettype($input)]);
+            throw new ValidationException("Only scalar types accepted for validation, '%s' given", gettype($input));
         }
 
         $input = is_string($input) ? trim($input) : $input;
-        $inputLabel = trim($label ?? ($inputLabel ? 'Field "'. $inputLabel .'"' : 'Field'));
+        $inputLabel = trim($label ?? ($inputLabel ? 'Field "' . $inputLabel . '"' : 'Field'));
 
         // Callback spec overrides all rules.
         if ($specType == 'callback') {
@@ -167,7 +158,7 @@ final class Rule
 
             if ($spec($input, $fail) === false) {
                 $code = Failure::CALLBACK;
-                $message = sprintf('Callback returned false for "%s".', $inputLabel);
+                $message = sprintf("Callback returned false for '%s'.", $inputLabel);
 
                 if (is_string($fail)) {
                     $message = $fail;
