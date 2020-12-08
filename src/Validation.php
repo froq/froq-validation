@@ -70,6 +70,7 @@ final class Validation
 
     /**
      * Constructor.
+     *
      * @param array|null $rules
      * @param array|null $options
      */
@@ -77,9 +78,7 @@ final class Validation
     {
         $rules && $this->setRules($rules);
 
-        $options = array_merge(self::$optionsDefault, $options ?? []);
-
-        $this->setOptions($options);
+        $this->setOptions($options, self::$optionsDefault);
     }
 
     /**
