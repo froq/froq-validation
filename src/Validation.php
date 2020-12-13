@@ -63,9 +63,9 @@ final class Validation
      * @since 4.2
      */
     private static array $optionsDefault = [
-        'exceptionMode'        => false,
-        'dropUndefinedFields'  => true,
-        'useFieldNamesAsLabel' => true,
+        'exceptionMode'       => false,
+        'dropUndefinedFields' => true,
+        'useFieldNameAsLabel' => true,
     ];
 
     /**
@@ -162,8 +162,8 @@ final class Validation
             }
         }
 
-        [$exceptionMode, $useFieldNamesAsLabel]
-            = $this->getOptions(['exceptionMode', 'useFieldNamesAsLabel']);
+        [$exceptionMode, $useFieldNameAsLabel]
+            = $this->getOptions(['exceptionMode', 'useFieldNameAsLabel']);
 
         foreach ($rules as $key => $rule) {
             // Nested.
@@ -171,13 +171,13 @@ final class Validation
                 foreach ((array) $rule as $rule) {
                     $field = $rule->getField();
                     $fieldValue = $data[$key][$field] ?? null;
-                    $fieldLabel = $useFieldNamesAsLabel ? $key . '.' . $field : null;
+                    $fieldLabel = $useFieldNameAsLabel ? $key . '.' . $field : null;
 
                     // Real check here sanitizing/overriding input data.
                     if (!$rule->ok($fieldValue, $fieldLabel)) {
                         $fail = $rule->getFail();
                         if ($exceptionMode) {
-                            throw new ValidationException($fail['message'], $fail['code']);
+                            throw new ValidationException($fail['message'], null, $fail['code']);
                         }
                         $fails[$key . '.' . $field] = $fail;
                     }
@@ -190,13 +190,13 @@ final class Validation
             elseif ($rule instanceof Rule) {
                 $field      = $rule->getField();
                 $fieldValue = $data[$field] ?? null;
-                $fieldLabel = $useFieldNamesAsLabel ? $field : null;
+                $fieldLabel = $useFieldNameAsLabel ? $field : null;
 
                 // Real check here sanitizing/overriding input data.
                 if (!$rule->ok($fieldValue, $fieldLabel)) {
                     $fail = $rule->getFail();
                     if ($exceptionMode) {
-                        throw new ValidationException($fail['message'], $fail['code']);
+                        throw new ValidationException($fail['message'], null, $fail['code']);
                     }
                     $fails[$field] = $fail;
                 }
