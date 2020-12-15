@@ -159,6 +159,7 @@ final class Rule
                     isset($fail['code']) && $code = $fail['code'];
                     isset($fail['message']) && $message = $fail['message'];
                 }
+
                 $this->toFail($code, $message);
 
                 return false;
@@ -199,7 +200,7 @@ final class Rule
             case Validation::TYPE_NUMERIC:
                 if (!is_numeric($in)) {
                     $this->toFail(Fail::TYPE,
-                        sprintf('%s value must be type of %s.', $inLabel, $type));
+                        sprintf('%s value must be type of %s, %s given.', $inLabel, $type, get_type($in)));
 
                     return false;
                 }
@@ -241,6 +242,15 @@ final class Rule
                 }
                 break;
             case Validation::TYPE_STRING:
+                if (!is_string($in)) {
+                    $this->toFail(Fail::NOT_MATCH,
+                        sprintf('%s value must be string, %s given.', $inLabel, get_type($in)));
+
+                    return false;
+                }
+
+                [$spec, $in] = [(string) $spec, (string) $in];
+
                 // Check regexp if provided.
                 if ($specType == 'regexp' && !preg_match($spec, $in)) {
                     $this->toFail(Fail::NOT_MATCH,
@@ -290,6 +300,7 @@ final class Rule
                 }
                 break;
             case Validation::TYPE_EMAIL:
+                [$spec, $in] = [(string) $spec, (string) $in];
                 if ($specType == 'regexp' && !preg_match($spec, $in)) {
                     $this->toFail(Fail::NOT_MATCH,
                         sprintf('%s value did not match with given pattern.', $inLabel));
@@ -307,6 +318,7 @@ final class Rule
             case Validation::TYPE_DATE:
             case Validation::TYPE_TIME:
             case Validation::TYPE_DATETIME:
+                [$spec, $in] = [(string) $spec, (string) $in];
                 if ($specType == 'regexp' && !preg_match($spec, $in)) {
                     $this->toFail(Fail::NOT_MATCH,
                         sprintf('%s value did not match with given pattern.', $inLabel));
@@ -332,6 +344,7 @@ final class Rule
                 }
                 break;
             case Validation::TYPE_URL:
+                [$spec, $in] = [(string) $spec, (string) $in];
                 if ($specType == 'regexp' && !preg_match($spec, $in)) {
                     $this->toFail(Fail::NOT_MATCH,
                         sprintf('%s value did not match with given pattern.', $inLabel));
@@ -359,9 +372,18 @@ final class Rule
                 }
                 break;
             case Validation::TYPE_UUID:
+                $null = $this->fieldOptions['null'] ?? false;
+                if (!$null && ($in === '00000000000000000000000000000000' ||
+                               $in === '00000000-0000-0000-0000-000000000000')) {
+                    $this->toFail(Fail::NOT_VALID,
+                        sprintf('%s value is not a valid UUID, null UUID given.', $inLabel));
+
+                    return false;
+                }
+
                 $dash = $this->fieldOptions['dash'] ?? true;
-                if (!$dash ? !preg_match('~^[a-f0-9]{32}$~', $in)
-                           : !preg_match('~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~', $in)
+                if (!$dash ? !preg_match('~^[a-f0-9]{32}$~', (string) $in)
+                           : !preg_match('~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~', (string) $in)
                 ) {
                     $this->toFail(Fail::NOT_VALID,
                         sprintf('%s value is not a valid UUID.', $inLabel));
