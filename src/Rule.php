@@ -323,7 +323,7 @@ final class Rule
                 }
                 break;
             case Validation::TYPE_UNIXTIME:
-                $inString = (string) $in;
+                [$in, $inString] = [(int) $in, (string) $in];
                 if (!ctype_digit($inString) || strlen($inString) != strlen((string) time())) {
                     $this->toFail(Fail::NOT_VALID,
                         sprintf('%s value is not a valid unixtime.', $inLabel));
