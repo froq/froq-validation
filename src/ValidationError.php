@@ -8,15 +8,17 @@ declare(strict_types=1);
 namespace froq\validation;
 
 /**
- * Fail.
+ * Validation Error.
+ *
+ * Represents a static class entity which is likely an enum holding error codes.
  *
  * @package froq\validation
- * @object  froq\validation\Fail
+ * @object  froq\validation\ValidationError
  * @author  Kerem Güneş <k-gun@mail.com>
  * @since   4.0, 4.3 Renamed from RuleFail.
  * @static
  */
-final class Fail
+final class ValidationError
 {
     /**
      * Fails.
