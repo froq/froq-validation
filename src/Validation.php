@@ -20,7 +20,6 @@ use froq\common\traits\OptionTrait;
 final class Validation
 {
     /**
-     * Option trait.
      * @see froq\common\traits\OptionTrait
      * @since 4.2
      */
@@ -45,20 +44,13 @@ final class Validation
                  TYPE_URL      = 'url',
                  TYPE_UUID     = 'uuid';
 
-    /**
-     * Rules.
-     * @var array<string, array>
-     */
+    /** @var array<string, array> */
     private array $rules = [];
 
-    /**
-     * Fails.
-     * @var array<string>
-     */
-    private array $fails = [];
+    /** @var array<string> */
+    private array $errors;
 
     /**
-     * Options default.
      * @var array
      * @since 4.2
      */
@@ -84,8 +76,8 @@ final class Validation
     /**
      * Set rules.
      *
-     * This method can be used in `init()` method in current controller in order to set or reset
-     * the rules after getting them from DB etc.
+     * This method can be used in `init()` method in current controller in order to set or reset the rules
+     * after getting them from database, a config file etc.
      *
      * @param  array $rules
      * @return void
@@ -96,9 +88,9 @@ final class Validation
             // Nested (eg: [user => [image => [fields => [id => [type => string], url => [type => url], ..]]]]).
             if (isset($rule['fields'])) {
                 if (empty($rule['fields'])) {
-                    throw new ValidationException("Rule 'fields' must be a non-empty array");
+                    throw new ValidationException('Rule `fields` must be a non-empty array');
                 } elseif (!is_array($rule['fields'])) {
-                    throw new ValidationException("Rule 'fields' must be an array, '%s' given", gettype($rule));
+                    throw new ValidationException('Rule `fields` must be an array, %s given', get_type($rule));
                 }
 
                 $this->rules[$key] = new Rules($rule['fields']);
@@ -120,22 +112,24 @@ final class Validation
     }
 
     /**
-     * Get fails.
-     * @return array
+     * Get errors property.
+     *
+     * @return array|null
      */
-    public function getFails(): array
+    public function errors(): array|null
     {
-        return $this->fails;
+        return $this->errors ?? null;
     }
 
     /**
-     * Validate.
+     * Validate sanitizing given data.
+     *
      * @param  array      &$data                This will override modifiying input data.
-     * @param  array|null &$fails               Shortcut for call getFails().
+     * @param  array|null &$errors              Shortcut for call getErrors().
      * @param  bool|null   $dropUndefinedFields This will drop undefined data keys.
      * @return bool
      */
-    public function validate(array &$data, array &$fails = null, bool $dropUndefinedFields = null): bool
+    public function validate(array &$data, array &$errors = null, bool $dropUndefinedFields = null): bool
     {
         if (empty($this->rules)) {
             throw new ValidationException('No rules to validate');
@@ -175,11 +169,7 @@ final class Validation
 
                     // Real check here sanitizing/overriding input data.
                     if (!$rule->okay($fieldValue, $fieldLabel)) {
-                        $fail = $rule->getFail();
-                        if ($exceptionMode) {
-                            throw new ValidationException($fail['message'], null, $fail['code']);
-                        }
-                        $fails[$key . '.' . $field] = $fail;
+                        $errors[$key . '.' . $field] = $rule->error();
                     }
 
                     // @override
@@ -194,11 +184,7 @@ final class Validation
 
                 // Real check here sanitizing/overriding input data.
                 if (!$rule->okay($fieldValue, $fieldLabel)) {
-                    $fail = $rule->getFail();
-                    if ($exceptionMode) {
-                        throw new ValidationException($fail['message'], null, $fail['code']);
-                    }
-                    $fails[$field] = $fail;
+                    $errors[$field] = $rule->error();
                 }
 
                 // @override
@@ -206,10 +192,18 @@ final class Validation
             }
         }
 
-        if ($fails != null) {
-            $this->fails = $fails;
+        if ($errors != null) {
+            if ($exceptionMode) {
+                throw new ValidationException('Validation failed, use errors() to see error details',
+                    errors: $errors);
+            }
+
+            // Store.
+            $this->errors = $errors;
+
             return false;
         }
+
         return true;
     }
 }
