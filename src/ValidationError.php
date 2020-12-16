@@ -10,7 +10,7 @@ namespace froq\validation;
 /**
  * Validation Error.
  *
- * Represents a static class entity which is likely an enum holding error codes.
+ * Represents a static class entity which is likely an enum holding error types/codes.
  *
  * @package froq\validation
  * @object  froq\validation\ValidationError
@@ -21,7 +21,7 @@ namespace froq\validation;
 final class ValidationError
 {
     /**
-     * Fails.
+     * Error types/codes.
      * @const int
      */
     public const CALLBACK   = 1,
