@@ -61,10 +61,10 @@ final class Rule
         [$type, $spec] = array_select($fieldOptions, ['type', 'spec']);
 
         if ($type != null) {
-            if (!in_array($type, self::$availableTypes, true)) {
+            if (!equals($type, ...self::$availableTypes)) {
                 throw new ValidationException('Field `type` is not valid (field type: %s, available types: %s)',
                     [$type, join(', ', self::$availableTypes)]);
-            } elseif ($spec == null && in_array($type, self::$specableTypes, true)) {
+            } elseif ($spec == null && equals($type, ...self::$specableTypes)) {
                 throw new ValidationException('Types %s require `spec` definition in options (field: %s)',
                     [join(', ', self::$specableTypes), $field]);
             }
@@ -72,7 +72,7 @@ final class Rule
 
         // Set spec type.
         if ($spec != null) {
-            if ($type === Validation::TYPE_JSON && !in_array($spec, ['array', 'object'])) {
+            if ($type === Validation::TYPE_JSON && !equals($spec, 'array', 'object')) {
                 throw new ValidationException('Invalid spec given, only `array` and `object` accepted for json '
                     . 'types (field: %s)', $field);
             } elseif ($spec instanceof Closure) {
@@ -80,8 +80,8 @@ final class Rule
             } else {
                 $fieldOptions['specType'] = gettype($spec);
 
-                if ($fieldOptions['specType'] != 'array'
-                    && in_array($type, [Validation::TYPE_BOOL, Validation::TYPE_ENUM], true)) {
+                if ($fieldOptions['specType'] !== 'array'
+                    && equals($type, Validation::TYPE_BOOL, Validation::TYPE_ENUM)) {
                     throw new ValidationException('Invalid spec given, only an array accepted for bool and enum '
                         . 'types (field: %s)', $field);
                 }
@@ -99,7 +99,7 @@ final class Rule
                 // Drop used and non-valid items.
                 unset($fieldOptions[$key]);
 
-                if (in_array($value, ['required', 'unsigned', 'fixed'], true)) {
+                if (equals($value, 'required', 'unsigned', 'fixed')) {
                     $fieldOptions[$value] = true;
                 }
             }
