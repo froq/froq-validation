@@ -413,7 +413,7 @@ final class Rule
      */
     private function toError(int $code, string $message, string|array $messageParams = null): bool
     {
-        $messageParams && $message = vsprintf($message, $messageParams);
+        $messageParams && $message = vsprintf($message, (array) $messageParams);
 
         $this->error = ['code' => $code, 'message' => $message];
 
