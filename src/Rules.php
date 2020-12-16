@@ -12,6 +12,8 @@ use froq\validation\{ValidationException, Rule};
 /**
  * Rules.
  *
+ * Represents a rule set entity which used by `Validation` class internally.
+ *
  * @package froq\validation
  * @object  froq\validation\Rules
  * @author  Kerem Güneş <k-gun@mail.com>
@@ -21,14 +23,15 @@ final class Rules
 {
     /**
      * Constructor.
+     *
      * @param array<string, array> $rules
      */
     public function __construct(array $rules)
     {
         foreach ($rules as $field => $fieldOptions) {
-            if (!is_string($field)) {
-                throw new ValidationException("Field name must a string, '%s' given", gettype($field));
-            }
+            is_string($field) || throw new ValidationException(
+                'Field name must a string, %s given', get_type($field)
+            );
 
             // Simply set rules with keys as property.
             $this->{$field} = new Rule($field, $fieldOptions);
