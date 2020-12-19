@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace froq\validation;
 
 use froq\validation\{ValidationException, Rule, Rules};
-use froq\common\traits\OptionTrait;
+use froq\common\trait\OptionTrait;
 
 /**
  * Validation.
@@ -20,7 +20,7 @@ use froq\common\traits\OptionTrait;
 final class Validation
 {
     /**
-     * @see froq\common\traits\OptionTrait
+     * @see froq\common\trait\OptionTrait
      * @since 4.2
      */
     use OptionTrait;
