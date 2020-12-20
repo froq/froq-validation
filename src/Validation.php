@@ -193,10 +193,9 @@ final class Validation
         }
 
         if ($errors != null) {
-            if ($exceptionMode) {
-                throw new ValidationException('Validation failed, use errors() to see error details',
-                    errors: $errors);
-            }
+            $exceptionMode && throw new ValidationException(
+                'Validation failed, use errors() to see error details', errors: $errors
+            );
 
             // Store.
             $this->errors = $errors;
