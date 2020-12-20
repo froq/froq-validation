@@ -55,7 +55,7 @@ final class Rule
      */
     public function __construct(string $field, array $fieldOptions)
     {
-        $field || throw new ValidationException('Field name must not be empty');
+        $field        || throw new ValidationException('Field name must not be empty');
         $fieldOptions || throw new ValidationException('Field options must not be empty');
 
         [$type, $spec] = array_select($fieldOptions, ['type', 'spec']);
@@ -72,7 +72,7 @@ final class Rule
 
         // Set spec type.
         if ($spec != null) {
-            if ($type === Validation::TYPE_JSON && !equals($spec, 'array', 'object')) {
+            if ($type == Validation::TYPE_JSON && !equals($spec, 'array', 'object')) {
                 throw new ValidationException('Invalid spec given, only `array` and `object` accepted for json '
                     . 'types (field: %s)', $field);
             } elseif ($spec instanceof Closure) {
@@ -80,14 +80,14 @@ final class Rule
             } else {
                 $fieldOptions['specType'] = gettype($spec);
 
-                if ($fieldOptions['specType'] !== 'array'
+                if ($fieldOptions['specType'] != 'array'
                     && equals($type, Validation::TYPE_BOOL, Validation::TYPE_ENUM)) {
                     throw new ValidationException('Invalid spec given, only an array accepted for bool and enum '
                         . 'types (field: %s)', $field);
                 }
 
                 // Detect regexp spec.
-                if ($fieldOptions['specType'] === 'string' && $spec[0] === '~') {
+                if ($fieldOptions['specType'] == 'string' && $spec[0] == '~') {
                     $fieldOptions['specType'] = 'regexp';
                 }
             }
@@ -168,22 +168,22 @@ final class Rule
                 get_type($in));
         }
 
-        $in = is_string($in) ? trim($in) : $in;
+        $in      = is_string($in) ? trim($in) : $in;
         $inLabel = trim($label ?? ($inLabel ? 'Field `' . $inLabel . '`' : 'Field'));
 
         // Callback spec overrides all rules.
-        if ($specType === 'callback') {
+        if ($specType == 'callback') {
             /** @var string|array */
             $error = null;
 
             if ($spec($in, $error) === false) {
-                $code = ValidationError::CALLBACK;
+                $code    = ValidationError::CALLBACK;
                 $message = sprintf('Callback returned false for `%s` field.', $inLabel);
 
                 if (is_string($error)) {
                     $message = $error;
                 } elseif (is_array($error)) {
-                    isset($error['code']) && $code = $error['code'];
+                    isset($error['code'])    && $code    = $error['code'];
                     isset($error['message']) && $message = $error['message'];
                 }
 
@@ -229,9 +229,9 @@ final class Rule
                 }
 
                 // Cast int/float.
-                if ($type === Validation::TYPE_INT) {
+                if ($type == Validation::TYPE_INT) {
                     $in = intval($in);
-                } elseif ($type === Validation::TYPE_FLOAT) {
+                } elseif ($type == Validation::TYPE_FLOAT) {
                     $in = floatval($in);
                 }
 
@@ -265,7 +265,7 @@ final class Rule
                 }
 
                 // Check regexp if provided.
-                if ($specType === 'regexp' && !preg_match($spec, $in)) {
+                if ($specType == 'regexp' && !preg_match($spec, $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
                         '%s value did not match with given pattern.', $inLabel);
                 }
@@ -304,7 +304,7 @@ final class Rule
                 return true;
             }
             case Validation::TYPE_EMAIL: {
-                if ($specType === 'regexp' && !preg_match($spec, (string) $in)) {
+                if ($specType == 'regexp' && !preg_match($spec, (string) $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
                         '%s value did not match with given pattern.', $inLabel);
                 }
@@ -318,13 +318,13 @@ final class Rule
             case Validation::TYPE_DATE:
             case Validation::TYPE_TIME:
             case Validation::TYPE_DATETIME: {
-                if ($specType === 'regexp' && !preg_match($spec, (string) $in)) {
+                if ($specType == 'regexp' && !preg_match($spec, (string) $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
                         '%s value did not match with given pattern.', $inLabel);
                 }
 
                 $date = date_create_from_format((string) $spec, (string) $in);
-                if (!$date || $date->format($spec) !== $in) {
+                if (!$date || $date->format($spec) <> $in) {
                     return $this->toError(ValidationError::NOT_VALID,
                         '%s value is not a valid date/time/datetime.', $inLabel);
                 }
@@ -333,7 +333,7 @@ final class Rule
             }
             case Validation::TYPE_UNIXTIME: {
                 [$in, $inString] = [(int) $in, (string) $in];
-                if (!ctype_digit($inString) || strlen($inString) !== strlen((string) time())) {
+                if (!ctype_digit($inString) || strlen($inString) <> strlen((string) time())) {
                     return $this->toError(ValidationError::NOT_VALID,
                         '%s value is not a valid Unixtime.', $inLabel);
                 }
@@ -341,12 +341,12 @@ final class Rule
                 return true;
             }
             case Validation::TYPE_URL: {
-                if ($specType === 'regexp' && !preg_match($spec, (string) $in)) {
+                if ($specType == 'regexp' && !preg_match($spec, (string) $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
                         '%s value did not match with given pattern.', $inLabel);
                 }
 
-                if ($specType === 'array') {
+                if ($specType == 'array') {
                     // Remove silly empty components (eg: path always comes even url is empty).
                     $url = array_filter((array) parse_url((string) $in), 'strlen');
 
@@ -385,10 +385,10 @@ final class Rule
                 // Validates JSON array/object inputs only.
                 if ($spec) {
                     $chars = ($in[0] ?? '') . ($in[-1] ?? '');
-                    if ($spec === 'array' && $chars !== '[]') {
+                    if ($spec == 'array' && $chars != '[]') {
                         return $this->toError(ValidationError::NOT_VALID,
                             '%s value is not a valid JSON array.', $inLabel);
-                    } elseif ($spec === 'object' && $chars !== '{}') {
+                    } elseif ($spec == 'object' && $chars != '{}') {
                         return $this->toError(ValidationError::NOT_VALID,
                             '%s value is not a valid JSON object.', $inLabel);
                     }
