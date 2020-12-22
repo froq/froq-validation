@@ -18,6 +18,7 @@ use froq\validation\{ValidationException, Rule};
  * @object  froq\validation\Rules
  * @author  Kerem Güneş <k-gun@mail.com>
  * @since   4.3
+ * @internal
  */
 final class Rules
 {

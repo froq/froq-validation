@@ -29,7 +29,7 @@ final class Rule
     /** @var array */
     private array $fieldOptions;
 
-    /** @var ?array<int, string> */
+    /** @var array<int, string> */
     private array $error;
 
     /** @var array */
@@ -61,10 +61,10 @@ final class Rule
         [$type, $spec] = array_select($fieldOptions, ['type', 'spec']);
 
         if ($type != null) {
-            if (!equals($type, ...self::$availableTypes)) {
+            if (!in_array($type, self::$availableTypes)) {
                 throw new ValidationException('Field `type` is not valid (field type: %s, available types: %s)',
                     [$type, join(', ', self::$availableTypes)]);
-            } elseif ($spec == null && equals($type, ...self::$specableTypes)) {
+            } elseif ($spec == null && in_array($type, self::$specableTypes)) {
                 throw new ValidationException('Types %s require `spec` definition in options (field: %s)',
                     [join(', ', self::$specableTypes), $field]);
             }
@@ -80,8 +80,7 @@ final class Rule
             } else {
                 $fieldOptions['specType'] = gettype($spec);
 
-                if ($fieldOptions['specType'] != 'array'
-                    && equals($type, Validation::TYPE_BOOL, Validation::TYPE_ENUM)) {
+                if ($fieldOptions['specType'] != 'array'&& equals($type, Validation::TYPE_BOOL, Validation::TYPE_ENUM)) {
                     throw new ValidationException('Invalid spec given, only an array accepted for bool and enum '
                         . 'types (field: %s)', $field);
                 }
@@ -110,7 +109,7 @@ final class Rule
             throw new ValidationException('Option `limit` must not be empty when option `fixed` given');
         }
 
-        $this->field = $field;
+        $this->field        = $field;
         $this->fieldOptions = $fieldOptions;
     }
 
@@ -145,7 +144,7 @@ final class Rule
     }
 
     /**
-     * Validate given input, sanitizing/modifying it to declared type.
+     * Validate given input, sanitizing/modifying it with given type in field options.
      *
      * @param  scalar      &$in
      * @param  string|null  $inLabel
@@ -364,6 +363,7 @@ final class Rule
                 return true;
             }
             case Validation::TYPE_UUID: {
+                // Accept null UUIDs?
                 $null = $this->fieldOptions['null'] ?? false;
                 if (!$null && ($in === '00000000000000000000000000000000' ||
                                $in === '00000000-0000-0000-0000-000000000000')) {
@@ -371,6 +371,7 @@ final class Rule
                         '%s value is not a valid UUID, null UUID given.', $inLabel);
                 }
 
+                // Accept non-dashed UUIDs?
                 $dash = $this->fieldOptions['dash'] ?? true;
                 if (!$dash ? !preg_match('~^[a-f0-9]{32}$~', (string) $in)
                            : !preg_match('~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~', (string) $in)
