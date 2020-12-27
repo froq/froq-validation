@@ -55,8 +55,8 @@ final class Validation
      * @since 4.2
      */
     private static array $optionsDefault = [
-        'exceptionMode'       => false,
-        'dropUndefinedFields' => true,
+        'throwErrors'         => false,
+        'dropUnknownFields'   => true,
         'useFieldNameAsLabel' => true,
     ];
 
@@ -124,24 +124,24 @@ final class Validation
     /**
      * Validate sanitizing given data.
      *
-     * @param  array      &$data                This will override modifiying input data.
-     * @param  array|null &$errors              Shortcut for call getErrors().
-     * @param  bool|null   $dropUndefinedFields This will drop undefined data keys.
+     * @param  array      &$data              This will override modifiying input data.
+     * @param  array|null &$errors            Shortcut for call getErrors().
+     * @param  bool|null   $dropUnknownFields This will drop undefined data keys when true.
      * @return bool
      */
-    public function validate(array &$data, array &$errors = null, bool $dropUndefinedFields = null): bool
+    public function validate(array &$data, array &$errors = null, bool $dropUnknownFields = null): bool
     {
         if (empty($this->rules)) {
             throw new ValidationException('No rules to validate');
         }
 
         // Get rules.
-        $rules = $this->rules;
+        $rules    = $this->rules;
         $ruleKeys = array_keys($rules);
 
         // Drop undefined data keys.
-        $dropUndefinedFields ??= $this->getOption('dropUndefinedFields');
-        if ($dropUndefinedFields) {
+        $dropUnknownFields ??= $this->getOption('dropUnknownFields');
+        if ($dropUnknownFields) {
             foreach ($data as $key => $value) {
                 if (!in_array($key, $ruleKeys)) {
                     unset($data[$key]);
@@ -156,8 +156,9 @@ final class Validation
             }
         }
 
-        [$exceptionMode, $useFieldNameAsLabel]
-            = $this->getOptions(['exceptionMode', 'useFieldNameAsLabel']);
+        [$throwErrors, $useFieldNameAsLabel] = $this->getOptions(
+            ['throwErrors', 'useFieldNameAsLabel']
+        );
 
         foreach ($rules as $key => $rule) {
             // Nested.
@@ -168,12 +169,15 @@ final class Validation
                     $fieldLabel = $useFieldNameAsLabel ? $key . '.' . $field : null;
 
                     // Real check here sanitizing/overriding input data.
-                    if (!$rule->okay($fieldValue, $fieldLabel)) {
+                    if (!$rule->okay($fieldValue, $fieldLabel, $dropped)) {
                         $errors[$key . '.' . $field] = $rule->error();
                     }
 
                     // @override
                     $data[$key][$field] = $fieldValue;
+
+                    // Drop if dropped state is true.
+                    if ($dropped) unset($data[$field]);
                 }
             }
             // Simple.
@@ -183,17 +187,20 @@ final class Validation
                 $fieldLabel = $useFieldNameAsLabel ? $field : null;
 
                 // Real check here sanitizing/overriding input data.
-                if (!$rule->okay($fieldValue, $fieldLabel)) {
+                if (!$rule->okay($fieldValue, $fieldLabel, $dropped)) {
                     $errors[$field] = $rule->error();
                 }
 
                 // @override
                 $data[$field] = $fieldValue;
+
+                // Drop if dropped state is true.
+                if ($dropped) unset($data[$field]);
             }
         }
 
         if ($errors != null) {
-            $exceptionMode && throw new ValidationException(
+            $throwErrors && throw new ValidationException(
                 'Validation failed, use errors() to see error details', errors: $errors
             );
 

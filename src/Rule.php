@@ -151,11 +151,11 @@ final class Rule
      * @return bool
      * @throws froq\validation\ValidationException
      */
-    public function okay(&$in, string $inLabel = null): bool
+    public function okay(&$in, string $inLabel = null, bool &$dropped = null): bool
     {
-        [$type, $label, $default, $limit, $limits, $spec, $specType, $required, $unsigned, $fixed, $filter]
+        [$type, $label, $default, $limit, $limits, $spec, $specType, $required, $unsigned, $fixed, $filter, $drop]
             = array_select($this->fieldOptions, ['type', 'label', 'default', 'limit', 'limits', 'spec', 'specType',
-                'required', 'unsigned', 'fixed', 'filter']);
+                'required', 'unsigned', 'fixed', 'filter', 'drop']);
 
         // Apply filter first if provided.
         if ($filter && is_callable($filter)) {
@@ -202,6 +202,13 @@ final class Rule
         // Assing default to input but do not return true to check also given default.
         if ($in === '') {
             $in = $default;
+        }
+
+        // Re-set dropped state.
+        $dropped = false;
+        if ($drop && !$in) {
+            $dropped = ($drop == 'null'  && $in === null)
+                    || ($drop == 'empty' && true); // 'Cos "!$in" in if above.
         }
 
         // Skip if null given as default that also checks given default.
