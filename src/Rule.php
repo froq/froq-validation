@@ -98,15 +98,18 @@ final class Rule
                 // Drop used and non-valid items.
                 unset($fieldOptions[$key]);
 
-                if (equals($value, 'required', 'unsigned', 'fixed')) {
+                if (equals($value, 'required', 'unsigned', 'cropped', 'fixed')) {
                     $fieldOptions[$value] = true;
                 }
             }
         }
 
-        // Check fixed limit.
-        if (isset($fieldOptions['fixed']) && !isset($fieldOptions['limit'])) {
-            throw new ValidationException('Option `limit` must not be empty when option `fixed` given');
+        // Check cropped & fixed stuff.
+        if (isset($fieldOptions['cropped']) && !isset($fieldOptions['limit'])) {
+            throw new ValidationException('Option `limit` must not be empty when option `cropped` given');
+        }
+        if (isset($fieldOptions['fixed']) && !isset($fieldOptions['fixval']) && !isset($fieldOptions['fixlen'])) {
+            throw new ValidationException('Option `fixval` or `fixlen` must not be empty when option `fixed` given');
         }
 
         $this->field        = $field;
@@ -153,9 +156,10 @@ final class Rule
      */
     public function okay(&$in, string $inLabel = null, bool &$dropped = null): bool
     {
-        [$type, $label, $default, $limit, $limits, $maxlen, $spec, $specType, $required, $unsigned, $fixed, $filter, $drop]
-            = array_select($this->fieldOptions, ['type', 'label', 'default', 'limit', 'limits', 'maxlen', 'spec', 'specType',
-                'required', 'unsigned', 'fixed', 'filter', 'drop']);
+        [$type, $label, $default, $spec, $specType, $drop, $crop, $limit,
+         $required, $unsigned, $cropped, $filter] = array_select($this->fieldOptions,
+            ['type', 'label', 'default', 'spec', 'specType', 'drop', 'crop', 'limit',
+             'required', 'unsigned', 'cropped', 'filter']);
 
         // Apply filter first if provided.
         if ($filter && is_callable($filter)) {
@@ -199,7 +203,7 @@ final class Rule
             return $this->toError(ValidationError::REQUIRED, '%s is required.', $inLabel);
         }
 
-        // Assing default to input but do not return true to check also given default.
+        // Assing default but do not return true to validate also given default.
         if ($in === '') {
             $in = $default;
         }
@@ -214,6 +218,13 @@ final class Rule
         // Skip if null given as default that also checks given default.
         if (!$required && $in === null) {
             return true;
+        }
+
+        // Crop.
+        if ($crop || $cropped) {
+            $in = mb_substr((string) $in, 0, (int) ($crop ?? $limit), (
+                $encoding = $this->fieldOptions['encoding'] ?? null
+            ));
         }
 
         // Validate by type.
@@ -244,21 +255,23 @@ final class Rule
                 // Make unsigned.
                 $unsigned && $in = abs($in);
 
+                [$fixed, $fixval, $range] = array_select($this->fieldOptions, ['fixed', 'fixval', 'range']);
+
                 // Check limit(s).
-                if (isset($limit)) {
-                    if (json_encode($in) <> json_encode($limit)) {
+                if ($fixed && isset($fixval)) {
+                    if (json_encode($in) <> json_encode($fixval)) {
                         return $this->toError(ValidationError::NOT_EQUAL,
-                            '%s value must be only %s.', [$inLabel, $limit]);
+                            '%s value must be only %s.', [$inLabel, $fixval]);
                     }
-                } elseif (isset($limits)) {
-                    @ [$limitMin, $limitMax] = (array) $limits;
-                    if (isset($limitMin) && $in < $limitMin) {
+                } elseif (isset($range)) {
+                    @ [$min, $max] = (array) $range;
+                    if (isset($min) && $in < $min) {
                         return $this->toError(ValidationError::MIN_VALUE,
-                            '%s value must be minimum %s.', [$inLabel, $limitMin]);
+                            '%s value must be minimum %s.', [$inLabel, $min]);
                     }
-                    if (isset($limitMax) && $in > $limitMax) {
+                    if (isset($max) && $in > $max) {
                         return $this->toError(ValidationError::MAX_VALUE,
-                            '%s value must be maximum %s.', [$inLabel, $limitMax]);
+                            '%s value must be maximum %s.', [$inLabel, $max]);
                     }
                 }
 
@@ -276,28 +289,26 @@ final class Rule
                         '%s value did not match with given pattern.', $inLabel);
                 }
 
-                $encoding = $this->fieldOptions['encoding'] ?? null;
+                [$fixed, $fixlen, $limits, $minlen, $maxlen] = array_select($this->fieldOptions,
+                    ['fixed', 'fixlen', 'limits', 'minlen', 'maxlen']);
 
-                // Crop.
-                if ($fixed || $maxlen) {
-                    $in = mb_substr($in, 0, (int) ($limit ?? $maxlen), $encoding);
-                }
+                $encoding ??= $this->fieldOptions['encoding'] ?? null;
 
                 // Check limit(s).
-                if (isset($limit)) {
-                    if (mb_strlen($in, $encoding) <> $limit) {
+                if ($fixed && isset($fixlen)) {
+                    if (mb_strlen($in, $encoding) <> $fixlen) {
                         return $this->toError(ValidationError::LENGTH,
-                            '%s value length must be %s.', [$inLabel, $limit]);
+                            '%s value length must be %s.', [$inLabel, $fixlen]);
                     }
-                } elseif (isset($limits)) {
-                    @ [$limitMin, $limitMax] = (array) $limits;
-                    if (isset($limitMin) && mb_strlen($in, $encoding) < $limitMin) {
+                } elseif (isset($limits) || isset($minlen) || isset($maxlen)) {
+                    @ [$min, $max] = (array) ($limits ?? [$minlen, $maxlen]);
+                    if (isset($min) && mb_strlen($in, $encoding) < $min) {
                         return $this->toError(ValidationError::MIN_LENGTH,
-                            '%s value minimum length must be %s.', [$inLabel, $limitMin]);
+                            '%s value minimum length must be %s.', [$inLabel, $min]);
                     }
-                    if (isset($limitMax) && mb_strlen($in, $encoding) > $limitMax) {
+                    if (isset($max) && mb_strlen($in, $encoding) > $max) {
                         return $this->toError(ValidationError::MAX_LENGTH,
-                            '%s value maximum length must be %s.', [$inLabel, $limitMax]);
+                            '%s value maximum length must be %s.', [$inLabel, $max]);
                     }
                 }
 
