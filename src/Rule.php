@@ -153,8 +153,8 @@ final class Rule
      */
     public function okay(&$in, string $inLabel = null, bool &$dropped = null): bool
     {
-        [$type, $label, $default, $limit, $limits, $spec, $specType, $required, $unsigned, $fixed, $filter, $drop]
-            = array_select($this->fieldOptions, ['type', 'label', 'default', 'limit', 'limits', 'spec', 'specType',
+        [$type, $label, $default, $limit, $limits, $maxlen, $spec, $specType, $required, $unsigned, $fixed, $filter, $drop]
+            = array_select($this->fieldOptions, ['type', 'label', 'default', 'limit', 'limits', 'maxlen', 'spec', 'specType',
                 'required', 'unsigned', 'fixed', 'filter', 'drop']);
 
         // Apply filter first if provided.
@@ -279,7 +279,9 @@ final class Rule
                 $encoding = $this->fieldOptions['encoding'] ?? null;
 
                 // Crop.
-                $fixed && $in = mb_substr($in, 0, (int) $limit, $encoding);
+                if ($fixed || $maxlen) {
+                    $in = mb_substr($in, 0, (int) ($limit ?? $maxlen), $encoding);
+                }
 
                 // Check limit(s).
                 if (isset($limit)) {
