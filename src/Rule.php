@@ -230,7 +230,7 @@ final class Rule
         // Validate by type.
         switch ($type) {
             case Validation::TYPE_ENUM: {
-                if (!in_array($in, $spec, true)) {
+                if (!in_array($in, $spec, (bool) ($this->fieldOptions['strict'] ?? true))) {
                     return $this->toError(ValidationError::NOT_FOUND,
                         '%s value must be one of %s options.', [$inLabel, join(', ', $spec)]);
                 }
