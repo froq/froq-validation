@@ -212,7 +212,7 @@ final class Rule
         $dropped = false;
         if ($drop && !$in) {
             $dropped = ($drop == 'null'  && $in === null)
-                    || (($drop == 'empty' || $drop === true) && true); // 'Cos "!$in" in if above.
+                    || (($drop == 'empty' || $drop == true) && true); // 'Cos "!$in" in if above.
         }
 
         // Skip if null given as default that also checks given default.
