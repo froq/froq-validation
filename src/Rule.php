@@ -167,12 +167,12 @@ final class Rule
         }
 
         if (isset($in) && !is_scalar($in)) {
-            throw new ValidationException('Only scalar types accepted for validation, `%s` given',
+            throw new ValidationException('Only scalar types accepted for validation, %s given',
                 get_type($in));
         }
 
         $in      = is_string($in) ? trim($in) : $in;
-        $inLabel = trim($label ?? ($inLabel ? 'Field `' . $inLabel . '`' : 'Field'));
+        $inLabel = trim($label ?? ($inLabel ? 'Field \'' . $inLabel . '\'' : 'Field'));
 
         // Callback spec overrides all rules.
         if ($specType == 'callback') {
