@@ -73,16 +73,16 @@ final class Rule
         // Set spec type.
         if ($spec != null) {
             if ($type == Validation::TYPE_JSON && !equals($spec, 'array', 'object')) {
-                throw new ValidationException('Invalid spec given, only `array` and `object` accepted for json '
-                    . 'types (field: %s)', $field);
+                throw new ValidationException('Invalid spec given, only `array` and `object` accepted for json'
+                    . ' types (field: %s)', $field);
             } elseif ($spec instanceof Closure) {
                 $fieldOptions['specType'] = 'callback';
             } else {
                 $fieldOptions['specType'] = gettype($spec);
 
-                if ($fieldOptions['specType'] != 'array'&& equals($type, Validation::TYPE_BOOL, Validation::TYPE_ENUM)) {
-                    throw new ValidationException('Invalid spec given, only an array accepted for bool and enum '
-                        . 'types (field: %s)', $field);
+                if ($fieldOptions['specType'] != 'array' && $type == Validation::TYPE_ENUM) {
+                    throw new ValidationException('Invalid spec given, only an array accepted for enum types'
+                        . ' (field: %s)', $field);
                 }
 
                 // Detect regexp spec.
@@ -200,7 +200,7 @@ final class Rule
 
         // Check required issue.
         if ($required && ($in === '' || $in === null)) {
-            return $this->toError(ValidationError::REQUIRED, '%s is required.', $inLabel);
+            return $this->toError(ValidationError::REQUIRED, '%s is required, none given.', $inLabel);
         }
 
         // Assing default but do not return true to validate also given default.
@@ -232,11 +232,12 @@ final class Rule
             case Validation::TYPE_ENUM: {
                 [$cast, $strict] = array_select($this->fieldOptions, ['cast', 'strict']);
 
+                // Cast.
                 $cast && settype($in, $cast);
 
                 if (!in_array($in, $spec, (bool) ($strict ?? true))) {
                     return $this->toError(ValidationError::NOT_FOUND,
-                        '%s value must be one of %s options.', [$inLabel, join(', ', $spec)]);
+                        '%s value must be one of these options: %s (input: %s).', [$inLabel, join(', ', $spec), $in]);
                 }
 
                 return true;
@@ -246,7 +247,7 @@ final class Rule
             case Validation::TYPE_NUMERIC: {
                 if (!is_numeric($in)) {
                     return $this->toError(ValidationError::TYPE,
-                        '%s value must be type of %s, %s given.', [$inLabel, $type, get_type($in)]);
+                        '%s value must be type of %s, %s given (input: %s).', [$inLabel, $type, get_type($in), $in]);
                 }
 
                 // Cast int/float.
@@ -265,17 +266,17 @@ final class Rule
                 if ($fixed && isset($fixval)) {
                     if (json_encode($in) <> json_encode($fixval)) {
                         return $this->toError(ValidationError::NOT_EQUAL,
-                            '%s value must be only %s.', [$inLabel, $fixval]);
+                            '%s value must be only %s (input: %s).', [$inLabel, $fixval, $in]);
                     }
                 } elseif (isset($range)) {
                     @ [$min, $max] = (array) $range;
                     if (isset($min) && $in < $min) {
                         return $this->toError(ValidationError::MIN_VALUE,
-                            '%s value must be minimum %s.', [$inLabel, $min]);
+                            '%s value must be minimum %s (input: %s).', [$inLabel, $min, $in]);
                     }
                     if (isset($max) && $in > $max) {
                         return $this->toError(ValidationError::MAX_VALUE,
-                            '%s value must be maximum %s.', [$inLabel, $max]);
+                            '%s value must be maximum %s (input: %s).', [$inLabel, $max, $in]);
                     }
                 }
 
@@ -284,13 +285,13 @@ final class Rule
             case Validation::TYPE_STRING: {
                 if (!is_string($in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
-                        '%s value must be string, %s given.', [$inLabel, get_type($in)]);
+                        '%s value must be string, %s given (input: %s).', [$inLabel, get_type($in), $in]);
                 }
 
                 // Check regexp if provided.
                 if ($specType == 'regexp' && !preg_match($spec, $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
-                        '%s value did not match with given pattern.', $inLabel);
+                        '%s value did not match with pattern %s (input: %s).', [$inLabel, $spec, $in]);
                 }
 
                 [$fixed, $fixlen, $limits, $minlen, $maxlen] = array_select($this->fieldOptions,
@@ -300,28 +301,28 @@ final class Rule
 
                 // Check limit(s).
                 if ($fixed && isset($fixlen)) {
-                    if (mb_strlen($in, $encoding) <> $fixlen) {
+                    if (($len = mb_strlen($in, $encoding)) <> $fixlen) {
                         return $this->toError(ValidationError::LENGTH,
-                            '%s value length must be %s.', [$inLabel, $fixlen]);
+                            '%s value length must be %s, (length: %s).', [$inLabel, $fixlen, $len]);
                     }
                 } elseif (isset($limits) || isset($minlen) || isset($maxlen)) {
                     @ [$min, $max] = (array) ($limits ?? [$minlen, $maxlen]);
-                    if (isset($min) && mb_strlen($in, $encoding) < $min) {
+                    if (isset($min) && ($len = mb_strlen($in, $encoding)) < $min) {
                         return $this->toError(ValidationError::MIN_LENGTH,
-                            '%s value minimum length must be %s.', [$inLabel, $min]);
+                            '%s value minimum length must be %s, (length: %s).', [$inLabel, $min, $len]);
                     }
-                    if (isset($max) && mb_strlen($in, $encoding) > $max) {
+                    if (isset($max) && ($len = mb_strlen($in, $encoding)) > $max) {
                         return $this->toError(ValidationError::MAX_LENGTH,
-                            '%s value maximum length must be %s.', [$inLabel, $max]);
+                            '%s value maximum length must be %s, (length: %s).', [$inLabel, $max, $len]);
                     }
                 }
 
                 return true;
             }
             case Validation::TYPE_BOOL: {
-                if (!in_array($in, $spec, true)) {
-                    return $this->toError(ValidationError::NOT_FOUND,
-                        '%s value must be one of %s options.', [$inLabel, join(', ', $spec)]);
+                if (!is_bool($in)) {
+                    return $this->toError(ValidationError::NOT_VALID,
+                        '%s value must be true or false (input: %s).', [$inLabel, $in]);
                 }
 
                 return true;
@@ -329,11 +330,11 @@ final class Rule
             case Validation::TYPE_EMAIL: {
                 if ($specType == 'regexp' && !preg_match($spec, (string) $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
-                        '%s value did not match with given pattern.', $inLabel);
+                        '%s value did not match with pattern %s (input: %s).', [$inLabel, $spec, $in]);
                 }
                 if (!filter_var($in, FILTER_VALIDATE_EMAIL)) {
                     return $this->toError(ValidationError::EMAIL,
-                        '%s value must be a valid email address.', $inLabel);
+                        '%s value must be a valid email address (input: %s).', [$inLabel, $in]);
                 }
 
                 return true;
@@ -343,30 +344,33 @@ final class Rule
             case Validation::TYPE_DATETIME: {
                 if ($specType == 'regexp' && !preg_match($spec, (string) $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
-                        '%s value did not match with given pattern.', $inLabel);
+                        '%s value did not match with pattern %s (input: %s).', [$inLabel, $spec, $in]);
                 }
 
                 $date = date_create_from_format((string) $spec, (string) $in);
                 if (!$date || $date->format($spec) <> $in) {
                     return $this->toError(ValidationError::NOT_VALID,
-                        '%s value is not a valid date/time/datetime.', $inLabel);
+                        '%s value is not a valid date/time/datetime (input: %s).', [$inLabel, $in]);
                 }
 
                 return true;
             }
             case Validation::TYPE_UNIXTIME: {
-                [$in, $inString] = [(int) $in, (string) $in];
-                if (!ctype_digit($inString) || strlen($inString) <> strlen((string) time())) {
+                $ins = (string) $in;
+                if (!ctype_digit($ins) || strlen($ins) <> strlen((string) time())) {
                     return $this->toError(ValidationError::NOT_VALID,
-                        '%s value is not a valid Unixtime.', $inLabel);
+                        '%s value is not a valid Unixtime (input: %s).', [$inLabel, $in]);
                 }
+
+                // Cast.
+                $in = (int) $in;
 
                 return true;
             }
             case Validation::TYPE_URL: {
                 if ($specType == 'regexp' && !preg_match($spec, (string) $in)) {
                     return $this->toError(ValidationError::NOT_MATCH,
-                        '%s value did not match with given pattern.', $inLabel);
+                        '%s value did not match with pattern %s (input: %s).', [$inLabel, $spec, $in]);
                 }
 
                 if ($specType == 'array') {
@@ -376,12 +380,12 @@ final class Rule
                     $missingComponents = array_diff($spec, array_keys($url));
                     if ($missingComponents) {
                         return $this->toError(ValidationError::NOT_VALID,
-                            '%s value is not a valid URL (missing components: %s).',
-                                [$inLabel, join(', ', $missingComponents)]);
+                            '%s value is not a valid URL (input: %s, missing components: %s).',
+                                [$inLabel, $in, join(', ', $missingComponents)]);
                     }
                 } elseif (!filter_var($in, FILTER_VALIDATE_URL)) {
                     return $this->toError(ValidationError::NOT_VALID,
-                        '%s value is not a valid URL.', $inLabel);
+                        '%s value is not a valid URL (input: %s).', [$inLabel, $in]);
                 }
 
                 return true;
@@ -392,7 +396,7 @@ final class Rule
                 if (!$null && ($in === '00000000000000000000000000000000' ||
                                $in === '00000000-0000-0000-0000-000000000000')) {
                     return $this->toError(ValidationError::NOT_VALID,
-                        '%s value is not a valid UUID, null UUID given.', $inLabel);
+                        '%s value is not a valid UUID, null UUID given (input: %s).', [$inLabel, $in]);
                 }
 
                 // Accept non-dashed UUIDs?
@@ -401,7 +405,7 @@ final class Rule
                            : !preg_match('~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~', (string) $in)
                 ) {
                     return $this->toError(ValidationError::NOT_VALID,
-                        '%s value is not a valid UUID.', $inLabel);
+                        '%s value is not a valid UUID (input: %s).', [$inLabel, $in]);
                 }
 
                 return true;
@@ -412,10 +416,10 @@ final class Rule
                     $chars = ($in[0] ?? '') . ($in[-1] ?? '');
                     if ($spec == 'array' && $chars != '[]') {
                         return $this->toError(ValidationError::NOT_VALID,
-                            '%s value is not a valid JSON array.', $inLabel);
+                            '%s value is not a valid JSON array (input: %s).', [$inLabel, $in]);
                     } elseif ($spec == 'object' && $chars != '{}') {
                         return $this->toError(ValidationError::NOT_VALID,
-                            '%s value is not a valid JSON object.', $inLabel);
+                            '%s value is not a valid JSON object (input: %s).', [$inLabel, $in]);
                     }
                 }
 
@@ -424,7 +428,7 @@ final class Rule
         }
 
         // None but never, normally.
-        throw new ValidationException('Unknown type %s', $type);
+        throw new ValidationException('Unknown type ' . $type);
     }
 
     /**
