@@ -213,6 +213,10 @@ final class Rule
         if ($drop && !$in) {
             $dropped = ($drop == 'null'  && $in === null)
                     || (($drop == 'empty' || $drop == true) && true); // 'Cos "!$in" in if above.
+
+            if ($dropped) { // Not needed go far.
+                return true;
+            }
         }
 
         // Skip if null given as default that also checks given default.
