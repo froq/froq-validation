@@ -157,13 +157,13 @@ final class Rule
     public function okay(&$in, string $inLabel = null, bool &$dropped = null): bool
     {
         [$type, $label, $default, $spec, $specType, $drop, $crop, $limit,
-         $required, $unsigned, $cropped, $filter] = array_select($this->fieldOptions,
+         $required, $unsigned, $cropped, $apply] = array_select($this->fieldOptions,
             ['type', 'label', 'default', 'spec', 'specType', 'drop', 'crop', 'limit',
-             'required', 'unsigned', 'cropped', 'filter']);
+             'required', 'unsigned', 'cropped', 'apply']);
 
-        // Apply filter first if provided.
-        if ($filter && is_callable($filter)) {
-            $in = $filter($in);
+        // Apply callable first if provided.
+        if ($apply && is_callable($apply)) {
+            $in = $apply($in);
         }
 
         if (isset($in) && !is_scalar($in)) {
