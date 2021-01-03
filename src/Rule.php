@@ -151,10 +151,12 @@ final class Rule
      *
      * @param  scalar      &$in
      * @param  string|null  $inLabel
+     * @param  array|null   $ins     @internal
+     * @param  array|null  &$dropped @internal
      * @return bool
      * @throws froq\validation\ValidationException
      */
-    public function okay(&$in, string $inLabel = null, bool &$dropped = null): bool
+    public function okay(&$in, string $inLabel = null, array $ins = null, bool &$dropped = null): bool
     {
         [$type, $label, $default, $spec, $specType, $drop, $crop, $limit,
          $required, $unsigned, $cropped, $apply] = array_select($this->fieldOptions,
@@ -179,7 +181,7 @@ final class Rule
             /** @var string|array */
             $error = null;
 
-            if ($spec($in, $error) === false) {
+            if ($spec($in, $ins, $error) === false) {
                 $code    = ValidationError::CALLBACK;
                 $message = sprintf('Callback returned false for `%s` field.', $inLabel);
 

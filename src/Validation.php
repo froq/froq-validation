@@ -169,7 +169,7 @@ final class Validation
                     $fieldLabel = $useFieldNameAsLabel ? $key . '.' . $field : null;
 
                     // Real check here sanitizing/overriding input data.
-                    if (!$rule->okay($fieldValue, $fieldLabel, $dropped)) {
+                    if (!$rule->okay($fieldValue, $fieldLabel, $data, $dropped)) {
                         $errors[$key . '.' . $field] = $rule->error();
                     }
 
@@ -187,7 +187,7 @@ final class Validation
                 $fieldLabel = $useFieldNameAsLabel ? $field : null;
 
                 // Real check here sanitizing/overriding input data.
-                if (!$rule->okay($fieldValue, $fieldLabel, $dropped)) {
+                if (!$rule->okay($fieldValue, $fieldLabel, $data, $dropped)) {
                     $errors[$field] = $rule->error();
                 }
 
