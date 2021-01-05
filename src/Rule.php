@@ -183,7 +183,7 @@ final class Rule
 
             if ($spec($in, $ins, $error) === false) {
                 $code    = ValidationError::CALLBACK;
-                $message = sprintf('Callback returned false for `%s` field.', $inLabel);
+                $message = sprintf('Callback returned false for %s field.', stracut($inLabel, 'Field ') ?: $inLabel);
 
                 if (is_string($error)) {
                     $message = $error;
