@@ -7,21 +7,22 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
+use froq\common\Error;
+use Throwable;
+
 /**
  * Validation Error.
- *
- * Represents a static class entity which is likely an enum holding error types/codes.
  *
  * @package froq\validation
  * @object  froq\validation\ValidationError
  * @author  Kerem Güneş
- * @since   4.0, 4.3 Renamed from RuleFail.
+ * @since   4.0, 4.3 Replaced with RuleFail, 5.0 Added errors stuff.
  * @static
  */
-final class ValidationError
+class ValidationError extends Error
 {
     /**
-     * Error types/codes.
+     * Error types (codes).
      * @const int
      */
     public const CALLBACK   = 1,
@@ -37,4 +38,37 @@ final class ValidationError
                  MAX_VALUE  = 11,
                  MIN_LENGTH = 12,
                  MAX_LENGTH = 13;
+
+    /** @var array */
+    private array $errors;
+
+    /**
+     * Constructor.
+     *
+     * @param string|Throwable $message
+     * @param any|null         $messageParams
+     * @param int|null         $code
+     * @param array|null       $errors
+     * @since 5.0
+     */
+    public function __construct(string|Throwable $message = null, $messageParams = null, int $code = null,
+        array $errors = null)
+    {
+        if ($errors !== null) {
+            $this->errors = $errors;
+        }
+
+        parent::__construct($message, $messageParams, $code, $previous);
+    }
+
+    /**
+     * Get errors.
+     *
+     * @return array|null
+     * @since  5.0
+     */
+    public final function errors(): array|null
+    {
+        return $this->errors ?? null;
+    }
 }
