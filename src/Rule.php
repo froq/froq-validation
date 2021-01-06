@@ -444,7 +444,7 @@ final class Rule
         }
 
         // None but never, normally.
-        throw new ValidationException('Unknown type ' . $type);
+        throw new ValidationException('Unknown type `%s`', $type);
     }
 
     /**

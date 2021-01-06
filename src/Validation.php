@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\validation\{ValidationException, Rule, Rules};
+use froq\validation\{ValidationException, ValidationError, Rule, Rules};
 use froq\common\trait\OptionTrait;
 
 /**
@@ -133,7 +133,7 @@ final class Validation
     public function validate(array &$data, array &$errors = null, bool $dropUnknownFields = null): bool
     {
         if (empty($this->rules)) {
-            throw new ValidationException('No rules to validate');
+            throw new ValidationException('No rules given to validate');
         }
 
         // Get rules.
@@ -201,7 +201,7 @@ final class Validation
         }
 
         if ($errors != null) {
-            $throwErrors && throw new ValidationException(
+            $throwErrors && throw new ValidationError(
                 'Validation failed, use errors() to see error details', errors: $errors
             );
 
