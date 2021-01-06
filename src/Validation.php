@@ -42,7 +42,8 @@ final class Validation
                  TYPE_UNIXTIME = 'unixtime',
                  TYPE_JSON     = 'json',
                  TYPE_URL      = 'url',
-                 TYPE_UUID     = 'uuid';
+                 TYPE_UUID     = 'uuid',
+                 TYPE_ARRAY    = 'array';
 
     /** @var array<string, array> */
     private array $rules = [];

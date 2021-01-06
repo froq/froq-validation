@@ -38,7 +38,7 @@ final class Rule
         Validation::TYPE_STRING,   Validation::TYPE_BOOL,     Validation::TYPE_ENUM,
         Validation::TYPE_EMAIL,    Validation::TYPE_DATE,     Validation::TYPE_TIME,
         Validation::TYPE_DATETIME, Validation::TYPE_UNIXTIME, Validation::TYPE_JSON,
-        Validation::TYPE_URL,      Validation::TYPE_UUID
+        Validation::TYPE_URL,      Validation::TYPE_UUID,     Validation::TYPE_ARRAY,
     ];
 
     /** @var array */
@@ -159,17 +159,19 @@ final class Rule
     public function okay(&$in, string $inLabel = null, array $ins = null, bool &$dropped = null): bool
     {
         [$type, $label, $default, $spec, $specType, $drop, $crop, $limit,
-         $required, $unsigned, $cropped, $apply] = array_select($this->fieldOptions,
+         $required, $unsigned, $cropped, $apply, $filter] = array_select($this->fieldOptions,
             ['type', 'label', 'default', 'spec', 'specType', 'drop', 'crop', 'limit',
-             'required', 'unsigned', 'cropped', 'apply']);
+             'required', 'unsigned', 'cropped', 'apply', 'filter']);
 
-        // Apply callable first if provided.
         if ($apply && is_callable($apply)) {
             $in = $apply($in);
         }
+        if ($filter && is_callable($filter)) {
+            $in = $filter($in);
+        }
 
-        if (isset($in) && !is_scalar($in)) {
-            throw new ValidationException('Only scalar types accepted for validation, %s given',
+        if (isset($in) && !is_scalar($in) && !is_array($in)) {
+            throw new ValidationException('Only scalar and array types accepted for validation, %s given',
                 get_type($in));
         }
 
@@ -290,7 +292,7 @@ final class Rule
             }
             case Validation::TYPE_STRING: {
                 if (!is_string($in)) {
-                    return $this->toError(ValidationError::NOT_MATCH,
+                    return $this->toError(ValidationError::TYPE,
                         '%s value must be string, %s given (input: %s).', [$inLabel, get_type($in), $in]);
                 }
 
@@ -327,8 +329,8 @@ final class Rule
             }
             case Validation::TYPE_BOOL: {
                 if (!is_bool($in)) {
-                    return $this->toError(ValidationError::NOT_VALID,
-                        '%s value must be true or false (input: %s).', [$inLabel, $in]);
+                    return $this->toError(ValidationError::TYPE,
+                        '%s value must be true or false, %s given (input: %s).', [$inLabel, get_type($in), $in]);
                 }
 
                 return true;
@@ -427,6 +429,14 @@ final class Rule
                         return $this->toError(ValidationError::NOT_VALID,
                             '%s value is not a valid JSON object (input: %s).', [$inLabel, $in]);
                     }
+                }
+
+                return true;
+            }
+            case Validation::TYPE_ARRAY: {
+                if (!is_array($in)) {
+                    return $this->toError(ValidationError::TYPE,
+                        '%s value must be array, %s given (input: %s).', [$inLabel, get_type($in), $in]);
                 }
 
                 return true;
