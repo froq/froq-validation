@@ -98,7 +98,7 @@ final class Rule
                 // Drop used and non-valid items.
                 unset($fieldOptions[$key]);
 
-                if (equals($value, 'required', 'unsigned', 'cropped', 'stripped', 'encoded', 'fixed')) {
+                if (equals($value, 'required', 'unsigned', 'cropped', 'dropped', 'stripped', 'encoded', 'fixed')) {
                     $fieldOptions[$value] = true;
                 }
             }
@@ -151,17 +151,17 @@ final class Rule
      *
      * @param  scalar      &$in
      * @param  string|null  $inLabel
-     * @param  array|null   $ins     @internal
-     * @param  array|null  &$dropped @internal
+     * @param  array|null   $_ins     @internal
+     * @param  array|null  &$_dropped @internal
      * @return bool
      * @throws froq\validation\ValidationException
      */
-    public function okay(&$in, string $inLabel = null, array $ins = null, bool &$dropped = null): bool
+    public function okay(&$in, string $inLabel = null, array $_ins = null, bool &$_dropped = null): bool
     {
         [$type, $label, $default, $spec, $specType, $drop, $crop, $limit,
          $required, $unsigned, $cropped, $apply] = array_select($this->fieldOptions,
             ['type', 'label', 'default', 'spec', 'specType', 'drop', 'crop', 'limit',
-             'required', 'unsigned', 'cropped', 'apply']);
+             'required', 'unsigned', 'cropped', 'dropped', 'apply']);
 
         if ($apply && is_callable($apply)) {
             $in = $apply($in);
@@ -180,7 +180,7 @@ final class Rule
             /** @var string|array */
             $error = null;
 
-            if ($spec($in, $ins, $error) === false) {
+            if ($spec($in, $_ins, $error) === false) {
                 $code    = ValidationError::CALLBACK;
                 $message = sprintf('Callback returned false for %s field.', stracut($inLabel, 'Field ') ?: $inLabel);
 
@@ -210,12 +210,12 @@ final class Rule
         }
 
         // Re-set dropped state.
-        $dropped = false;
-        if ($drop && !$in) {
-            $dropped = ($drop == 'null'  && $in === null)
-                    || (($drop == 'empty' || $drop == true) && true); // 'Cos "!$in" in if above.
+        $_dropped = false;
+        if (($drop || $dropped) && !$in) {
+            $_dropped = ($drop == 'null'  && $in === null)
+                    || (($drop == 'empty' || $drop == true || $dropped) && true); // 'Cos "!$in" in if above.
 
-            if ($dropped) { // Not needed go far.
+            if ($_dropped) { // Not needed go far.
                 return true;
             }
         }
