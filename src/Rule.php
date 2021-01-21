@@ -98,7 +98,7 @@ final class Rule
                 // Drop used and non-valid items.
                 unset($fieldOptions[$key]);
 
-                if (equals($value, 'required', 'unsigned', 'cropped', 'dropped', 'stripped', 'encoded', 'fixed')) {
+                if (equals($value, 'required', 'unsigned', 'cropped', 'dropped', 'stripped', 'fixed', 'html')) {
                     $fieldOptions[$value] = true;
                 }
             }
@@ -299,8 +299,8 @@ final class Rule
                         '%s value did not match with pattern %s (input: %s).', [$inLabel, $spec, $in]);
                 }
 
-                [$fixed, $fixlen, $limits, $minlen, $maxlen, $stripped, $encoded] = array_select($this->fieldOptions,
-                    ['fixed', 'fixlen', 'limits', 'minlen', 'maxlen', 'stripped', 'encoded']);
+                [$fixed, $fixlen, $limits, $minlen, $maxlen, $stripped, $html] = array_select($this->fieldOptions,
+                    ['fixed', 'fixlen', 'limits', 'minlen', 'maxlen', 'stripped', 'html']);
 
                 $encoding ??= $this->fieldOptions['encoding'] ?? null;
 
@@ -325,7 +325,7 @@ final class Rule
                 }
 
                 // Encode quot & html stuff.
-                $encoded && $in = str_replace(["'", '"', '<', '>'], ['&#39;', '&#34;', '&lt;', '&gt;'], $in);
+                $html && $in = str_replace(["'", '"', '<', '>'], ['&#39;', '&#34;', '&lt;', '&gt;'], $in);
 
                 return true;
             }
