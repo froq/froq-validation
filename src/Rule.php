@@ -159,7 +159,7 @@ final class Rule
     public function okay(&$in, string $inLabel = null, array $_ins = null, bool &$_dropped = null): bool
     {
         [$type, $label, $default, $spec, $specType, $drop, $crop, $limit,
-         $required, $unsigned, $cropped, $apply] = array_select($this->fieldOptions,
+         $required, $unsigned, $cropped, $dropped, $apply] = array_select($this->fieldOptions,
             ['type', 'label', 'default', 'spec', 'specType', 'drop', 'crop', 'limit',
              'required', 'unsigned', 'cropped', 'dropped', 'apply']);
 
