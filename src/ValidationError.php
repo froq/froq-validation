@@ -49,10 +49,11 @@ class ValidationError extends Error
      * @param any|null         $messageParams
      * @param int|null         $code
      * @param array|null       $errors
+     * @param Throwable|null   $previous
      * @since 5.0
      */
     public function __construct(string|Throwable $message = null, $messageParams = null, int $code = null,
-        array $errors = null)
+        array $errors = null, Throwable $previous = null)
     {
         if ($errors !== null) {
             $this->errors = $errors;
