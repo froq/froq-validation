@@ -57,6 +57,13 @@ class ValidationError extends Error
     {
         if ($errors !== null) {
             $this->errors = $errors;
+        } elseif ($code !== null || $message !== null) {
+            // For instance throws.
+            if ($message && $messageParams) {
+                $message = vsprintf($message, (array) $messageParams);
+            }
+
+            $this->errors = ['code' => $code, 'message' => $message];
         }
 
         parent::__construct($message, $messageParams, $code, $previous);
