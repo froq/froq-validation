@@ -199,14 +199,14 @@ final class Rule
             return true;
         }
 
+        // Assing default but do not return true to validate also given default.
+        if ($in === '' || $in === null) {
+            $in = $default;
+        }
+
         // Check required issue.
         if ($required && ($in === '' || $in === null)) {
             return $this->toError(ValidationError::REQUIRED, '%s is required, none given.', $inLabel);
-        }
-
-        // Assing default but do not return true to validate also given default.
-        if ($in === '') {
-            $in = $default;
         }
 
         // Re-set dropped state.
