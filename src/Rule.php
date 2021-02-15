@@ -43,8 +43,7 @@ final class Rule
 
     /** @var array */
     private static array $specableTypes = [
-        Validation::TYPE_BOOL, Validation::TYPE_ENUM,
-        Validation::TYPE_DATE, Validation::TYPE_DATETIME
+        Validation::TYPE_ENUM, Validation::TYPE_DATE, Validation::TYPE_DATETIME
     ];
 
     /**
