@@ -400,19 +400,24 @@ final class Rule
                 return true;
             }
             case Validation::TYPE_UUID: {
-                // Accept null UUIDs?
+                // Accept null UUIDs? @default=false
                 $null = $this->fieldOptions['null'] ?? false;
+
                 if (!$null && ($in === '00000000000000000000000000000000' ||
                                $in === '00000000-0000-0000-0000-000000000000')) {
                     return $this->toError(ValidationError::NOT_VALID,
                         '%s value is not a valid UUID, null UUID given (input: %s).', [$inLabel, $in]);
                 }
 
-                // Accept non-dashed UUIDs?
-                $dash = $this->fieldOptions['dash'] ?? true;
-                if (!$dash ? !preg_match('~^[a-f0-9]{32}$~', (string) $in)
-                           : !preg_match('~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~', (string) $in)
-                ) {
+                // Accept non-dashed UUIDs or both? @default=both
+                $dash    = $this->fieldOptions['dash'] ?? null;
+                $pattern = match ($dash) {
+                    default => '~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|[a-f0-9]{32}$~',
+                    true    => '~^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$~',
+                    false   => '~^[a-f0-9]{32}$~',
+                };
+
+                if (!preg_match($pattern, (string) $in)) {
                     return $this->toError(ValidationError::NOT_VALID,
                         '%s value is not a valid UUID (input: %s).', [$inLabel, $in]);
                 }
