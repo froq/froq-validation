@@ -46,6 +46,11 @@ final class Rule
         Validation::TYPE_ENUM, Validation::TYPE_DATE, Validation::TYPE_DATETIME
     ];
 
+    /** @var array */
+    private static array $boolables = [
+        'required', 'unsigned', 'cropped', 'dropped', 'nulled', 'stripped', 'fixed', 'html',
+    ];
+
     /**
      * Constructor.
      *
@@ -91,13 +96,13 @@ final class Rule
             }
         }
 
-        // Set other rules (eg: [foo => [type => int, ..., required, ...]]).
+        // Set other rules (eg: [foo => [type => int, .., required, ..]]).
         foreach ($fieldOptions as $key => $value) {
             if (is_int($key)) {
                 // Drop used and non-valid items.
                 unset($fieldOptions[$key]);
 
-                if (equals($value, 'required', 'unsigned', 'cropped', 'dropped', 'stripped', 'fixed', 'html')) {
+                if (in_array($value, self::$boolables)) {
                     $fieldOptions[$value] = true;
                 }
             }
@@ -157,10 +162,10 @@ final class Rule
      */
     public function okay(&$in, string $inLabel = null, array $_ins = null, bool &$_dropped = null): bool
     {
-        [$type, $label, $default, $spec, $specType, $drop, $crop, $limit,
-         $required, $unsigned, $cropped, $dropped, $apply] = array_select($this->fieldOptions,
-            ['type', 'label', 'default', 'spec', 'specType', 'drop', 'crop', 'limit',
-             'required', 'unsigned', 'cropped', 'dropped', 'apply']);
+        [$type, $label, $default, $spec, $specType, $drop, $crop, $limit, $cast,
+         $required, $unsigned, $cropped, $dropped, $nulled, $apply] = array_select($this->fieldOptions,
+            ['type', 'label', 'default', 'spec', 'specType', 'drop', 'crop', 'limit', 'cast',
+             'required', 'unsigned', 'cropped', 'dropped', 'nulled', 'apply']);
 
         if ($apply && is_callable($apply)) {
             $in = $apply($in);
@@ -198,6 +203,11 @@ final class Rule
             return true;
         }
 
+        // Nullable inputs.
+        if (!$in && ($nulled || $cast || $cast == 'null')) {
+            $in = is_callable($cast) ? $cast($in) : null;
+        }
+
         // Assing default but do not return true to validate also given default.
         if ($in === '' || $in === null) {
             $in = $default;
@@ -210,11 +220,12 @@ final class Rule
 
         // Re-set dropped state.
         $_dropped = false;
-        if (($drop || $dropped) && !$in) {
+        if (!$in && ($drop || $dropped)) {
             $_dropped = ($drop == 'null'  && $in === null)
-                    || (($drop == 'empty' || $drop == true || $dropped) && true); // 'Cos "!$in" in if above.
+                     || ($drop == 'empty' || $drop == true || $dropped);
 
-            if ($_dropped) { // Not needed go far.
+            // Not needed to go far.
+            if ($_dropped) {
                 return true;
             }
         }
@@ -234,12 +245,11 @@ final class Rule
         // Validate by type.
         switch ($type) {
             case Validation::TYPE_ENUM: {
-                [$cast, $strict] = array_select($this->fieldOptions, ['cast', 'strict']);
-
                 // Cast.
                 $cast && settype($in, $cast);
 
-                if (!in_array($in, $spec, (bool) ($strict ?? true))) {
+                $strict = $this->fieldOptions['strict'] ?? true;
+                if (!in_array($in, $spec, (bool) $strict)) {
                     return $this->toError(ValidationError::NOT_FOUND,
                         '%s value must be one of these options: %s (input: %s).', [$inLabel, join(', ', $spec), $in]);
                 }
