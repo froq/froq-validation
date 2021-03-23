@@ -277,8 +277,8 @@ final class Rule
                 [$fixed, $fixval, $range] = array_select($this->fieldOptions, ['fixed', 'fixval', 'range']);
 
                 // Check limit(s).
-                if ($fixed && isset($fixval)) {
-                    if (json_encode($in) <> json_encode($fixval)) {
+                if ($fixed || $fixval) {
+                    if (json_encode($in) <> json_encode($fixed ?? $fixval)) {
                         return $this->toError(ValidationError::NOT_EQUAL,
                             '%s value must be only %s (input: %s).', [$inLabel, $fixval, $in]);
                     }
@@ -316,8 +316,8 @@ final class Rule
                 $stripped && $in = strip_tags($in);
 
                 // Check limit(s).
-                if ($fixed && isset($fixlen)) {
-                    if (($len = mb_strlen($in, $encoding)) <> $fixlen) {
+                if ($fixed || $fixlen) {
+                    if (($len = mb_strlen($in, $encoding)) <> ($fixed ?? $fixlen)) {
                         return $this->toError(ValidationError::LENGTH,
                             '%s value length must be %s, (length: %s).', [$inLabel, $fixlen, $len]);
                     }
