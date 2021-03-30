@@ -222,7 +222,9 @@ final class Rule
         $_dropped = false;
         if (!$in && ($drop || $dropped)) {
             $_dropped = ($drop == 'null'  && $in === null)
-                     || ($drop == 'empty' || $drop == true || $dropped);
+                     || ($drop == 'empty' || $drop === true)
+                     || (is_callable($drop) && $drop($in))
+                     || $dropped;
 
             // Not needed to go far.
             if ($_dropped) {
