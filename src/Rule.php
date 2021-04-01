@@ -377,16 +377,15 @@ final class Rule
                 return true;
             }
             case Validation::TYPE_UNIXTIME: {
-                $sin = (string) $in;
-
-                // Accept 0 times? @default=false
-                $zero = $this->fieldOptions['zero'] ?? false;
-                if ($zero && $sin === '0') {
+                // Accepted exceptions? @default=false
+                $accept = $this->fieldOptions['accept'] ?? null;
+                if ($accept && in_array($in, (array) $accept)) {
                     $in = (int) $in; // Cast.
 
                     return true;
                 }
 
+                $sin = (string) $in;
                 if (!ctype_digit($sin) || strlen($sin) <> strlen((string) time())) {
                     return $this->toError(ValidationError::NOT_VALID,
                         '%s value is not a valid Unixtime (input: %s).', [$inLabel, $in]);
