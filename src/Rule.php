@@ -76,7 +76,7 @@ final class Rule
 
         // Set spec type.
         if ($spec != null) {
-            if ($type == Validation::TYPE_JSON && !equals($spec, 'array', 'object')) {
+            if ($type == Validation::TYPE_JSON && !in_array($spec, ['array', 'object'])) {
                 throw new ValidationException('Invalid spec given, only `array` and `object` accepted for json'
                     . ' types (field: %s)', $field);
             } elseif ($spec instanceof Closure) {
@@ -204,8 +204,10 @@ final class Rule
         }
 
         // Nullable inputs.
-        if (!$in && ($nulled || $cast || $cast == 'null')) {
-            $in = is_callable($cast) ? $cast($in) : null;
+        if (!in_array($type, [Validation::TYPE_BOOL])) {
+            if (!$in && ($nulled || $cast || $cast == 'null')) {
+                $in = is_callable($cast) ? $cast($in) : null;
+            }
         }
 
         // Assing default but do not return true to validate also given default.
@@ -341,6 +343,9 @@ final class Rule
                 return true;
             }
             case Validation::TYPE_BOOL: {
+                // Cast.
+                $cast && $in = boolval($in);
+
                 if (!is_bool($in)) {
                     return $this->toError(ValidationError::TYPE,
                         '%s value must be true or false, %s given (input: %s).', [$inLabel, get_type($in), $in]);
