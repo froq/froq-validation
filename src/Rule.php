@@ -358,9 +358,15 @@ final class Rule
                     return $this->toError(ValidationError::NOT_MATCH,
                         '%s value did not match with pattern %s (input: %s).', [$inLabel, $spec, $in]);
                 }
+
                 if (!filter_var($in, FILTER_VALIDATE_EMAIL)) {
                     return $this->toError(ValidationError::EMAIL,
                         '%s value must be a valid email address (input: %s).', [$inLabel, $in]);
+                }
+
+                if ($limit && ($len = mb_strlen((string) $in)) > $limit) {
+                    return $this->toError(ValidationError::MAX_LENGTH,
+                            '%s value maximum length must be %s, (length: %s).', [$inLabel, $limit, $len]);
                 }
 
                 return true;
