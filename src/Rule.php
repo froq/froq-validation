@@ -23,17 +23,8 @@ use Closure;
  */
 final class Rule
 {
-    /** @var string */
-    private string $field;
-
     /** @var array */
-    private array $fieldOptions;
-
-    /** @var array<int, string> */
-    private array $error;
-
-    /** @var array */
-    private static array $availableTypes = [
+    public const AVAILABLE_TYPES = [
         Validation::TYPE_INT,      Validation::TYPE_FLOAT,    Validation::TYPE_NUMERIC,
         Validation::TYPE_STRING,   Validation::TYPE_BOOL,     Validation::TYPE_ENUM,
         Validation::TYPE_EMAIL,    Validation::TYPE_DATE,     Validation::TYPE_TIME,
@@ -42,14 +33,23 @@ final class Rule
     ];
 
     /** @var array */
-    private static array $specableTypes = [
+    public const SPECABLE_TYPES = [
         Validation::TYPE_ENUM, Validation::TYPE_DATE, Validation::TYPE_DATETIME
     ];
 
     /** @var array */
-    private static array $boolables = [
+    public const BOOLABLES = [
         'required', 'unsigned', 'cropped', 'dropped', 'nulled', 'stripped', 'fixed', 'html',
     ];
+
+    /** @var string */
+    private string $field;
+
+    /** @var array */
+    private array $fieldOptions;
+
+    /** @var array<int, string> */
+    private array $error;
 
     /**
      * Constructor.
@@ -65,12 +65,12 @@ final class Rule
         [$type, $spec] = array_select($fieldOptions, ['type', 'spec']);
 
         if ($type != null) {
-            if (!in_array($type, self::$availableTypes)) {
+            if (!in_array($type, self::AVAILABLE_TYPES)) {
                 throw new ValidationException('Field `type` is not valid (field type: %s, available types: %s)',
-                    [$type, join(', ', self::$availableTypes)]);
-            } elseif ($spec == null && in_array($type, self::$specableTypes)) {
+                    [$type, join(', ', self::AVAILABLE_TYPES)]);
+            } elseif ($spec == null && in_array($type, self::SPECABLE_TYPES)) {
                 throw new ValidationException('Types %s require `spec` definition in options (field: %s)',
-                    [join(', ', self::$specableTypes), $field]);
+                    [join(', ', self::SPECABLE_TYPES), $field]);
             }
         }
 
@@ -102,7 +102,7 @@ final class Rule
                 // Drop used and non-valid items.
                 unset($fieldOptions[$key]);
 
-                if (in_array($value, self::$boolables)) {
+                if (in_array($value, self::BOOLABLES)) {
                     $fieldOptions[$value] = true;
                 }
             }
