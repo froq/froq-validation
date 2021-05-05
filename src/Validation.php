@@ -86,6 +86,11 @@ final class Validation
     public function setRules(array $rules): void
     {
         foreach ($rules as $key => $rule) {
+            // Skip empty rules (why, must be well defined already?).
+            if (empty($rule)) {
+                continue;
+            }
+
             // Nested (eg: [user => [image => [fields => [id => [type => string], url => [type => url], ..]]]]).
             if (isset($rule['fields'])) {
                 if (empty($rule['fields'])) {
