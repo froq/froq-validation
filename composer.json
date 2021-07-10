@@ -1,15 +1,13 @@
 {
     "name": "froq/froq-validation",
-    "homepage": "https://github.com/froq/froq-validation",
+    "homepage": "http://github.com/froq/froq-validation",
     "description": "Froq! Validation.",
     "keywords": ["froq", "validation"],
-    "license": "MIT",
-    "authors": [
-        {"name": "Kerem Güneş", "email": "k-gun@mail.com"}
-    ],
+    "license": "Apache-2.0",
+    "authors": [{"name": "Kerem Güneş"}],
     "require": {
-        "php": "^7.4",
-        "froq/froq-common": "^4.0"
+        "php": "^8.0",
+        "froq/froq-common": "^5.0"
     },
     "autoload": {
         "classmap": ["src/"]

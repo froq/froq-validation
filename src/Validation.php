@@ -1,46 +1,26 @@
 <?php
 /**
- * MIT License <https://opensource.org/licenses/mit>
- *
- * Copyright (c) 2015 Kerem Güneş
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is furnished
- * to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Copyright (c) 2015 · Kerem Güneş
+ * Apache License 2.0 · http://github.com/froq/froq-validation
  */
 declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\common\traits\OptionTrait;
-use froq\validation\{ValidationException, Rule, Rules};
+use froq\validation\{ValidationException, ValidationError, Rule, Rules};
+use froq\common\trait\OptionTrait;
 
 /**
  * Validation.
  * @package froq\validation
  * @object  froq\validation\Validation
- * @author  Kerem Güneş <k-gun@mail.com>
+ * @author  Kerem Güneş
  * @since   1.0
  */
 final class Validation
 {
     /**
-     * Option trait.
-     * @see froq\common\traits\OptionTrait
+     * @see froq\common\trait\OptionTrait
      * @since 4.2
      */
     use OptionTrait;
@@ -62,33 +42,28 @@ final class Validation
                  TYPE_UNIXTIME = 'unixtime',
                  TYPE_JSON     = 'json',
                  TYPE_URL      = 'url',
-                 TYPE_UUID     = 'uuid';
+                 TYPE_UUID     = 'uuid',
+                 TYPE_ARRAY    = 'array';
 
-    /**
-     * Rules.
-     * @var array<string, array>
-     */
+    /** @var array<string, array> */
     private array $rules = [];
 
-    /**
-     * Fails.
-     * @var array<string>
-     */
-    private array $fails = [];
+    /** @var array<string> */
+    private array $errors;
 
     /**
-     * Options default.
      * @var array
      * @since 4.2
      */
     private static array $optionsDefault = [
-        'exceptionMode'        => false,
-        'dropUndefinedFields'  => true,
-        'useFieldNamesAsLabel' => true,
+        'throwErrors'         => false,
+        'dropUnknownFields'   => true,
+        'useFieldNameAsLabel' => true,
     ];
 
     /**
      * Constructor.
+     *
      * @param array|null $rules
      * @param array|null $options
      */
@@ -96,16 +71,14 @@ final class Validation
     {
         $rules && $this->setRules($rules);
 
-        $options = array_merge(self::$optionsDefault, $options ?? []);
-
-        $this->setOptions($options);
+        $this->setOptions($options, self::$optionsDefault);
     }
 
     /**
      * Set rules.
      *
-     * This method can be used in `init()` method in current controller in order to set or reset
-     * the rules after getting them from DB etc.
+     * This method can be used in `init()` method in current controller in order to set or reset the rules
+     * after getting them from database, a config file etc.
      *
      * @param  array $rules
      * @return void
@@ -113,13 +86,17 @@ final class Validation
     public function setRules(array $rules): void
     {
         foreach ($rules as $key => $rule) {
+            // Skip empty rules (why, must be well defined already?).
+            if (empty($rule)) {
+                continue;
+            }
+
             // Nested (eg: [user => [image => [fields => [id => [type => string], url => [type => url], ..]]]]).
             if (isset($rule['fields'])) {
                 if (empty($rule['fields'])) {
-                    throw new ValidationException('Rule "fields" must be a non-empty array');
+                    throw new ValidationException('Rule `fields` must be a non-empty array');
                 } elseif (!is_array($rule['fields'])) {
-                    throw new ValidationException('Rule "fields" must be an array, "%s" given',
-                        [gettype($rule)]);
+                    throw new ValidationException('Rule `fields` must be an array, %s given', get_type($rule));
                 }
 
                 $this->rules[$key] = new Rules($rule['fields']);
@@ -141,34 +118,36 @@ final class Validation
     }
 
     /**
-     * Get fails.
-     * @return array
+     * Get errors property.
+     *
+     * @return array|null
      */
-    public function getFails(): array
+    public function errors(): array|null
     {
-        return $this->fails;
+        return $this->errors ?? null;
     }
 
     /**
-     * Validate.
-     * @param  array      &$data                This will override modifiying input data.
-     * @param  array|null &$fails               Shortcut for call getFails().
-     * @param  bool|null   $dropUndefinedFields This will drop undefined data keys.
+     * Validate sanitizing given data.
+     *
+     * @param  array      &$data              This will override modifiying input data.
+     * @param  array|null &$errors            Shortcut for call getErrors().
+     * @param  bool|null   $dropUnknownFields This will drop undefined data keys when true.
      * @return bool
      */
-    public function validate(array &$data, array &$fails = null, bool $dropUndefinedFields = null): bool
+    public function validate(array &$data, array &$errors = null, bool $dropUnknownFields = null): bool
     {
         if (empty($this->rules)) {
-            throw new ValidationException('No rules to validate');
+            throw new ValidationException('No rules given to validate');
         }
 
         // Get rules.
-        $rules = $this->rules;
+        $rules    = $this->rules;
         $ruleKeys = array_keys($rules);
 
         // Drop undefined data keys.
-        $dropUndefinedFields ??= $this->getOption('dropUndefinedFields');
-        if ($dropUndefinedFields) {
+        $dropUnknownFields ??= $this->getOption('dropUnknownFields');
+        if ($dropUnknownFields) {
             foreach ($data as $key => $value) {
                 if (!in_array($key, $ruleKeys)) {
                     unset($data[$key]);
@@ -183,54 +162,60 @@ final class Validation
             }
         }
 
-        [$exceptionMode, $useFieldNamesAsLabel]
-            = $this->getOptions(['exceptionMode', 'useFieldNamesAsLabel']);
+        [$throwErrors, $useFieldNameAsLabel] = $this->getOptions(
+            ['throwErrors', 'useFieldNameAsLabel']
+        );
 
         foreach ($rules as $key => $rule) {
             // Nested.
             if ($rule instanceof Rules) {
                 foreach ((array) $rule as $rule) {
-                    $field = $rule->getField();
+                    $field      = $rule->field();
                     $fieldValue = $data[$key][$field] ?? null;
-                    $fieldLabel = $useFieldNamesAsLabel ? $key .'.'. $field : null;
+                    $fieldLabel = $useFieldNameAsLabel ? $key . '.' . $field : null;
 
                     // Real check here sanitizing/overriding input data.
-                    if (!$rule->ok($fieldValue, $fieldLabel)) {
-                        $fail = $rule->getFail();
-                        if ($exceptionMode) {
-                            throw new ValidationException($fail['message'], $fail['code']);
-                        }
-                        $fails[$key .'.'. $field] = $fail;
+                    if (!$rule->okay($fieldValue, $fieldLabel, $data, $dropped)) {
+                        $errors[$key . '.' . $field] = $rule->error();
                     }
 
                     // @override
                     $data[$key][$field] = $fieldValue;
+
+                    // Drop if dropped state is true.
+                    if ($dropped) unset($data[$field]);
                 }
             }
             // Simple.
             elseif ($rule instanceof Rule) {
-                $field      = $rule->getField();
+                $field      = $rule->field();
                 $fieldValue = $data[$field] ?? null;
-                $fieldLabel = $useFieldNamesAsLabel ? $field : null;
+                $fieldLabel = $useFieldNameAsLabel ? $field : null;
 
                 // Real check here sanitizing/overriding input data.
-                if (!$rule->ok($fieldValue, $fieldLabel)) {
-                    $fail = $rule->getFail();
-                    if ($exceptionMode) {
-                        throw new ValidationException($fail['message'], $fail['code']);
-                    }
-                    $fails[$field] = $fail;
+                if (!$rule->okay($fieldValue, $fieldLabel, $data, $dropped)) {
+                    $errors[$field] = $rule->error();
                 }
 
                 // @override
                 $data[$field] = $fieldValue;
+
+                // Drop if dropped state is true.
+                if ($dropped) unset($data[$field]);
             }
         }
 
-        if ($fails != null) {
-            $this->fails = $fails;
+        if ($errors != null) {
+            $throwErrors && throw new ValidationError(
+                'Validation failed, use errors() to see error details', errors: $errors
+            );
+
+            // Store.
+            $this->errors = $errors;
+
             return false;
         }
+
         return true;
     }
 }
