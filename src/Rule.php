@@ -7,14 +7,11 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\validation\{Validation, ValidationError, ValidationException};
-use Closure;
-
 /**
  * Rule.
  *
- * Represents a rule entity which accepts a field & field options and is able to validate given field input
- * by its options, filling `$error` property with last occured error.
+ * A rule class, accepts a field & field options and is able to validate given
+ * field input by its options, filling `$error` property with last occured error.
  *
  * @package froq\validation
  * @object  froq\validation\Rule
@@ -54,8 +51,9 @@ final class Rule
     /**
      * Constructor.
      *
-     * @param string $field
-     * @param array  $fieldOptions
+     * @param  string $field
+     * @param  array  $fieldOptions
+     * @throws froq\validation\ValidationException
      */
     public function __construct(string $field, array $fieldOptions)
     {
@@ -66,27 +64,35 @@ final class Rule
 
         if ($type != null) {
             if (!in_array($type, self::AVAILABLE_TYPES)) {
-                throw new ValidationException('Field `type` is not valid (field type: %s, available types: %s)',
-                    [$type, join(', ', self::AVAILABLE_TYPES)]);
+                throw new ValidationException(
+                    'Field `type` is not valid (field type: %s, available types: %s)',
+                    [$type, join(', ', self::AVAILABLE_TYPES)]
+                );
             } elseif ($spec == null && in_array($type, self::SPECABLE_TYPES)) {
-                throw new ValidationException('Types %s require `spec` definition in options (field: %s)',
-                    [join(', ', self::SPECABLE_TYPES), $field]);
+                throw new ValidationException(
+                    'Types %s require `spec` definition in options (field: %s)',
+                    [join(', ', self::SPECABLE_TYPES), $field]
+                );
             }
         }
 
         // Set spec type.
         if ($spec != null) {
             if ($type == Validation::TYPE_JSON && !in_array($spec, ['array', 'object'])) {
-                throw new ValidationException('Invalid spec given, only `array` and `object` accepted for json'
-                    . ' types (field: %s)', $field);
-            } elseif ($spec instanceof Closure) {
+                throw new ValidationException(
+                    'Invalid spec given, only `array` and `object` accepted for json types (field: %s)',
+                    $field
+                );
+            } elseif ($spec instanceof \Closure) {
                 $fieldOptions['specType'] = 'callback';
             } else {
                 $fieldOptions['specType'] = gettype($spec);
 
                 if ($fieldOptions['specType'] != 'array' && $type == Validation::TYPE_ENUM) {
-                    throw new ValidationException('Invalid spec given, only an array accepted for enum types'
-                        . ' (field: %s)', $field);
+                    throw new ValidationException(
+                        'Invalid spec given, only an array accepted for enum types (field: %s)',
+                        $field
+                    );
                 }
 
                 // Detect regexp spec.
@@ -110,10 +116,10 @@ final class Rule
 
         // Check cropped & fixed stuff.
         if (isset($fieldOptions['cropped']) && !isset($fieldOptions['limit'])) {
-            throw new ValidationException('Option `limit` must not be empty when option `cropped` given');
+            throw new ValidationException('Option `limit` cannot be empty when option `cropped` given');
         }
         if (isset($fieldOptions['fixed']) && !isset($fieldOptions['fixval']) && !isset($fieldOptions['fixlen'])) {
-            throw new ValidationException('Option `fixval` or `fixlen` must not be empty when option `fixed` given');
+            throw new ValidationException('Option `fixval` or `fixlen` cannot be empty when option `fixed` given');
         }
 
         $this->field        = $field;
@@ -153,14 +159,14 @@ final class Rule
     /**
      * Validate given input, sanitizing/modifying it with given type in field options.
      *
-     * @param  scalar      &$in
+     * @param  mixed       &$in
      * @param  string|null  $inLabel
      * @param  array|null   $_ins     @internal
      * @param  array|null  &$_dropped @internal
      * @return bool
      * @throws froq\validation\ValidationException
      */
-    public function okay(&$in, string $inLabel = null, array $_ins = null, bool &$_dropped = null): bool
+    public function okay(mixed &$in, string $inLabel = null, array $_ins = null, bool &$_dropped = null): bool
     {
         [$type, $label, $default, $spec, $specType, $drop, $crop, $limit, $cast,
          $required, $unsigned, $cropped, $dropped, $nulled, $apply] = array_select($this->fieldOptions,
@@ -171,7 +177,7 @@ final class Rule
             $in = $apply($in);
         }
 
-        if (isset($in) && !is_scalar($in) && !is_array($in)) {
+        if ($in !== null && !is_scalar($in) && !is_array($in)) {
             throw new ValidationException('Only scalar and array types accepted for validation, %s given',
                 get_type($in));
         }

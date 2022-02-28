@@ -16,7 +16,7 @@ use Throwable;
  * @package froq\validation
  * @object  froq\validation\ValidationError
  * @author  Kerem Güneş
- * @since   4.0, 4.3 Replaced with RuleFail, 5.0 Added errors stuff.
+ * @since   4.0, 4.3, 5.0
  * @static
  */
 class ValidationError extends Error
@@ -46,18 +46,18 @@ class ValidationError extends Error
      * Constructor.
      *
      * @param string|Throwable $message
-     * @param any|null         $messageParams
+     * @param mixed|null       $messageParams
      * @param int|null         $code
      * @param array|null       $errors
      * @param Throwable|null   $previous
      * @since 5.0
      */
-    public function __construct(string|Throwable $message = null, $messageParams = null, int $code = null,
+    public function __construct(string|Throwable $message = null, mixed $messageParams = null, int $code = null,
         array $errors = null, Throwable $previous = null)
     {
         if ($errors !== null) {
             $this->errors = $errors;
-        } elseif ($code !== null || $message !== null) {
+        } elseif ($message !== null || $code !== null) {
             // For instance throws.
             if ($message && $messageParams) {
                 $message = vsprintf($message, (array) $messageParams);

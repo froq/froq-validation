@@ -7,11 +7,11 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\validation\{ValidationException, ValidationError, Rule, Rules};
 use froq\common\trait\OptionTrait;
 
 /**
  * Validation.
+ *
  * @package froq\validation
  * @object  froq\validation\Validation
  * @author  Kerem Güneş
@@ -19,42 +19,26 @@ use froq\common\trait\OptionTrait;
  */
 final class Validation
 {
-    /**
-     * @see froq\common\trait\OptionTrait
-     * @since 4.2
-     */
+    /** @see froq\common\trait\OptionTrait */
     use OptionTrait;
 
-    /**
-     * Types.
-     * @const string
-     */
-    public const TYPE_INT      = 'int',
-                 TYPE_FLOAT    = 'float',
-                 TYPE_NUMERIC  = 'numeric',
-                 TYPE_STRING   = 'string',
-                 TYPE_BOOL     = 'bool',
-                 TYPE_ENUM     = 'enum',
-                 TYPE_EMAIL    = 'email',
-                 TYPE_DATE     = 'date',
-                 TYPE_TIME     = 'time',
-                 TYPE_DATETIME = 'datetime',
-                 TYPE_UNIXTIME = 'unixtime',
-                 TYPE_JSON     = 'json',
-                 TYPE_URL      = 'url',
-                 TYPE_UUID     = 'uuid',
+    /** @const string */
+    public const TYPE_INT      = 'int',      TYPE_FLOAT    = 'float',
+                 TYPE_NUMERIC  = 'numeric',  TYPE_STRING   = 'string',
+                 TYPE_BOOL     = 'bool',     TYPE_ENUM     = 'enum',
+                 TYPE_EMAIL    = 'email',    TYPE_DATE     = 'date',
+                 TYPE_TIME     = 'time',     TYPE_DATETIME = 'datetime',
+                 TYPE_UNIXTIME = 'unixtime', TYPE_JSON     = 'json',
+                 TYPE_URL      = 'url',      TYPE_UUID     = 'uuid',
                  TYPE_ARRAY    = 'array';
 
-    /** @var array<string, array> */
+    /** @var array */
     private array $rules = [];
 
-    /** @var array<string> */
+    /** @var array */
     private array $errors;
 
-    /**
-     * @var array
-     * @since 4.2
-     */
+    /** @var array */
     private static array $optionsDefault = [
         'throwErrors'         => false,
         'dropUnknownFields'   => true,
@@ -77,11 +61,12 @@ final class Validation
     /**
      * Set rules.
      *
-     * This method can be used in `init()` method in current controller in order to set or reset the rules
-     * after getting them from database, a config file etc.
+     * This method can be used in `init()` method in current controller in order to set or
+     * reset the rules after getting them from database, a config file etc.
      *
      * @param  array $rules
      * @return void
+     * @throws froq\validation\ValidationException
      */
     public function setRules(array $rules): void
     {
@@ -134,6 +119,7 @@ final class Validation
      * @param  array|null &$errors            Shortcut for call getErrors().
      * @param  bool|null   $dropUnknownFields This will drop undefined data keys when true.
      * @return bool
+     * @throws froq\validation\{ValidationException|ValidationError}
      */
     public function validate(array &$data, array &$errors = null, bool $dropUnknownFields = null): bool
     {
@@ -162,9 +148,10 @@ final class Validation
             }
         }
 
-        [$throwErrors, $useFieldNameAsLabel] = $this->getOptions(
-            ['throwErrors', 'useFieldNameAsLabel']
-        );
+        // Empty always.
+        $errors = null;
+
+        $useFieldNameAsLabel = $this->options['useFieldNameAsLabel'];
 
         foreach ($rules as $key => $rule) {
             // Nested.
@@ -205,9 +192,10 @@ final class Validation
             }
         }
 
-        if ($errors != null) {
-            $throwErrors && throw new ValidationError(
-                'Validation failed, use errors() to see error details', errors: $errors
+        if ($errors) {
+            $this->options['throwErrors'] && throw new ValidationError(
+                'Validation failed, use errors() to see error details',
+                errors: $errors
             );
 
             // Store.

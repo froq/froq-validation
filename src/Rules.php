@@ -7,12 +7,10 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\validation\{ValidationException, Rule};
-
 /**
  * Rules.
  *
- * Represents a rule set entity which used by `Validation` class internally.
+ * A rule set class, used by `Validation` class internally.
  *
  * @package froq\validation
  * @object  froq\validation\Rules
@@ -25,7 +23,8 @@ final class Rules
     /**
      * Constructor.
      *
-     * @param array<string, array> $rules
+     * @param  array $rules
+     * @throws froq\validation\ValidationException
      */
     public function __construct(array $rules)
     {
