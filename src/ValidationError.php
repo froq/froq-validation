@@ -45,11 +45,11 @@ class ValidationError extends Error
     /**
      * Constructor.
      *
-     * @param string|Throwable $message
-     * @param mixed|null       $messageParams
-     * @param int|null         $code
-     * @param array|null       $errors
-     * @param Throwable|null   $previous
+     * @param string|Throwable|null $message
+     * @param mixed|null            $messageParams
+     * @param int|null              $code
+     * @param array|null            $errors
+     * @param Throwable|null        $previous
      * @since 5.0
      */
     public function __construct(string|Throwable $message = null, mixed $messageParams = null, int $code = null,
