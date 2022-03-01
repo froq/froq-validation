@@ -65,13 +65,13 @@ final class Rule
         if ($type != null) {
             if (!in_array($type, self::AVAILABLE_TYPES)) {
                 throw new ValidationException(
-                    'Field `type` is not valid (field type: %s, available types: %s)',
-                    [$type, join(', ', self::AVAILABLE_TYPES)]
+                    'Field `type` is invalid (field type: %s, available types: %a)',
+                    [$type, self::AVAILABLE_TYPES]
                 );
             } elseif ($spec == null && in_array($type, self::SPECABLE_TYPES)) {
                 throw new ValidationException(
-                    'Types %s require `spec` definition in options (field: %s)',
-                    [join(', ', self::SPECABLE_TYPES), $field]
+                    'Types %a require `spec` definition in options (field: %s)',
+                    [self::SPECABLE_TYPES, $field]
                 );
             }
         }
