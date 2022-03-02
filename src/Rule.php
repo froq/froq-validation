@@ -20,7 +20,7 @@ namespace froq\validation;
  */
 final class Rule
 {
-    /** @var array */
+    /** @const array */
     public const AVAILABLE_TYPES = [
         Validation::TYPE_INT,      Validation::TYPE_FLOAT,    Validation::TYPE_NUMERIC,
         Validation::TYPE_STRING,   Validation::TYPE_BOOL,     Validation::TYPE_ENUM,
@@ -29,12 +29,12 @@ final class Rule
         Validation::TYPE_URL,      Validation::TYPE_UUID,     Validation::TYPE_ARRAY,
     ];
 
-    /** @var array */
+    /** @const array */
     public const SPECABLE_TYPES = [
         Validation::TYPE_ENUM, Validation::TYPE_DATE, Validation::TYPE_DATETIME
     ];
 
-    /** @var array */
+    /** @const array */
     public const BOOLABLES = [
         'required', 'unsigned', 'cropped', 'dropped', 'nulled', 'stripped', 'fixed', 'html',
     ];
@@ -45,7 +45,7 @@ final class Rule
     /** @var array */
     private array $fieldOptions;
 
-    /** @var array<int, string> */
+    /** @var array */
     private array $error;
 
     /**
@@ -492,13 +492,7 @@ final class Rule
     }
 
     /**
-     * Fill error property with given code and message/message params.
-     *
-     * @param  int               $code
-     * @param  string            $message
-     * @param  string|array|null $messageParams
-     * @return bool
-     * @internal
+     * Fill error property with given code and message/message params & return false.
      */
     private function toError(int $code, string $message, string|array $messageParams = null): bool
     {
