@@ -63,12 +63,12 @@ final class Rule
         [$type, $spec] = array_select($fieldOptions, ['type', 'spec']);
 
         if ($type != null) {
-            if (!in_array($type, self::AVAILABLE_TYPES)) {
+            if (!in_array($type, self::AVAILABLE_TYPES, true)) {
                 throw new ValidationException(
                     'Field `type` is invalid (field type: %s, available types: %a)',
                     [$type, self::AVAILABLE_TYPES]
                 );
-            } elseif ($spec == null && in_array($type, self::SPECABLE_TYPES)) {
+            } elseif ($spec == null && in_array($type, self::SPECABLE_TYPES, true)) {
                 throw new ValidationException(
                     'Types %a require `spec` definition in options (field: %s)',
                     [self::SPECABLE_TYPES, $field]
@@ -78,7 +78,7 @@ final class Rule
 
         // Set spec type.
         if ($spec != null) {
-            if ($type == Validation::TYPE_JSON && !in_array($spec, ['array', 'object'])) {
+            if ($type == Validation::TYPE_JSON && !in_array($spec, ['array', 'object'], true)) {
                 throw new ValidationException(
                     'Invalid spec given, only `array` and `object` accepted for json types (field: %s)',
                     $field
@@ -108,7 +108,7 @@ final class Rule
                 // Drop used and non-valid items.
                 unset($fieldOptions[$key]);
 
-                if (in_array($value, self::BOOLABLES)) {
+                if (in_array($value, self::BOOLABLES, true)) {
                     $fieldOptions[$value] = true;
                 }
             }
@@ -210,7 +210,7 @@ final class Rule
         }
 
         // Nullable inputs.
-        if (!in_array($type, [Validation::TYPE_BOOL])) {
+        if (!in_array($type, [Validation::TYPE_BOOL], true)) {
             if (!$in && ($nulled || $cast || $cast == 'null')) {
                 $in = is_callable($cast) ? $cast($in) : null;
             }
@@ -398,7 +398,7 @@ final class Rule
             case Validation::TYPE_UNIXTIME: {
                 // Accepted exceptions? @default=false
                 $accept = $this->fieldOptions['accept'] ?? null;
-                if ($accept && in_array($in, (array) $accept)) {
+                if ($accept && in_array($in, (array) $accept, true)) {
                     $in = (int) $in; // Cast.
 
                     return true;
