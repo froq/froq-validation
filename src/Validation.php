@@ -19,7 +19,6 @@ use froq\common\trait\OptionTrait;
  */
 final class Validation
 {
-    /** @see froq\common\trait\OptionTrait */
     use OptionTrait;
 
     /** @const string */
