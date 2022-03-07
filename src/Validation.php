@@ -131,7 +131,7 @@ final class Validation
         $ruleKeys = array_keys($rules);
 
         // Drop undefined data keys.
-        $dropUnknownFields ??= $this->getOption('dropUnknownFields');
+        $dropUnknownFields ??= $this->options['dropUnknownFields'];
         if ($dropUnknownFields) {
             foreach ($data as $key => $value) {
                 if (!in_array($key, $ruleKeys)) {
