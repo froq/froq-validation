@@ -18,7 +18,7 @@ namespace froq\validation;
  * @since   4.3
  * @internal
  */
-final class Rules
+final class Rules extends \stdClass
 {
     /**
      * Constructor.
@@ -30,11 +30,11 @@ final class Rules
     {
         foreach ($rules as $field => $fieldOptions) {
             is_string($field) || throw new ValidationException(
-                'Field name must a string, %s given', get_type($field)
+                'Field name must a string, %t given', $field
             );
 
             // Simply set rules with keys as property.
-            $this->{$field} = new Rule($field, $fieldOptions);
+            $this->$field = new Rule($field, $fieldOptions);
         }
     }
 }

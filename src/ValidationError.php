@@ -22,7 +22,7 @@ use Throwable;
 class ValidationError extends Error
 {
     /**
-     * Error types (codes).
+     * Error codes.
      * @const int
      */
     public const CALLBACK   = 1,
@@ -30,8 +30,8 @@ class ValidationError extends Error
                  TYPE       = 3,
                  LENGTH     = 4,
                  EMAIL      = 5,
-                 NOT_EQUAL  = 6,
-                 NOT_FOUND  = 7,
+                 ENUM       = 6,
+                 NOT_EQUAL  = 7,
                  NOT_VALID  = 8,
                  NOT_MATCH  = 9,
                  MIN_VALUE  = 10,
