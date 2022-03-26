@@ -109,16 +109,16 @@ abstract class Validator
 
         // Apply drop option.
         if ($drop !== null && (
-                // If drop option is true-like.
-                $this->isTrue($drop) ||
-                // If drop option is 'empty' and input is empty.
-                ($drop === 'empty' && !$this->input) ||
-                // If drop option is '' and input is ''.
-                ($drop === '' && $this->input === '') ||
-                // If drop option is 'null' and input is null.
-                ($drop === 'null' && $this->input === null) ||
-                // If drop option is callable and returns true.
-                ($this->isCallable($drop) && $drop($this->input))
+            // If drop option is true-like.
+            $this->isTrue($drop) ||
+            // If drop option is 'empty' and input is empty.
+            ($drop === 'empty' && !$this->input) ||
+            // If drop option is '' and input is ''.
+            ($drop === '' && $this->input === '') ||
+            // If drop option is 'null' and input is null.
+            ($drop === 'null' && $this->input === null) ||
+            // If drop option is callable and returns true.
+            ($this->isCallable($drop) && $drop($this->input))
         )) {
             $this->result->dropped = true;
             return;

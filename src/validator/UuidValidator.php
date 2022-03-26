@@ -88,7 +88,7 @@ class UuidValidator extends Validator
     }
 
     /**
-     * Get patter by options.
+     * Get pattern by options.
      */
     private function getPattern(?bool $dashed, ?bool $cased): string
     {
