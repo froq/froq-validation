@@ -126,6 +126,8 @@ final class Validation
      */
     public function validate(array &$data, array &$errors = null, bool $dropUnknownFields = null): bool
     {
+        $errors = null; // @clear
+
         if (empty($this->rules)) {
             throw new ValidationException('No rules given to validate');
         }
@@ -141,8 +143,6 @@ final class Validation
 
         // Populate absent data fields with null.
         $data = array_default($data, $ruleKeys, null);
-
-        $errors = null; // @clear
 
         $useFieldNameAsLabel = $this->options['useFieldNameAsLabel'];
 
