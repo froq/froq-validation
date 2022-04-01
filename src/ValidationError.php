@@ -72,11 +72,22 @@ class ValidationError extends Error
     /**
      * Get errors.
      *
-     * @return array|null
+     * @return ?array
      * @since  5.0
      */
-    public final function errors(): array|null
+    public final function errors(): ?array
     {
         return $this->errors ?? null;
+    }
+
+    /**
+     * Get tip.
+     *
+     * @return string
+     * @since  6.0
+     */
+    public static function tip(): string
+    {
+        return 'use a try/catch block and use errors() to see error details';
     }
 }

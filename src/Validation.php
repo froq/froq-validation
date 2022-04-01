@@ -98,9 +98,9 @@ final class Validation
     /**
      * Get rules.
      *
-     * @return array|null
+     * @return ?array
      */
-    public function getRules(): array|null
+    public function getRules(): ?array
     {
         return $this->rules ?? null;
     }
@@ -108,9 +108,9 @@ final class Validation
     /**
      * Get errors property.
      *
-     * @return array|null
+     * @return ?array
      */
-    public function errors(): array|null
+    public function errors(): ?array
     {
         return $this->errors ?? null;
     }
