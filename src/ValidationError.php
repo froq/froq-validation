@@ -88,6 +88,6 @@ class ValidationError extends Error
      */
     public static function tip(): string
     {
-        return 'use a try/catch block and use errors() to see error details';
+        return 'use a try/catch block and call errors() to see error details';
     }
 }
