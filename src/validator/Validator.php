@@ -182,7 +182,7 @@ abstract class Validator
      */
     protected final function isCallable(mixed $option): bool
     {
-        return ($option && $option !== 'null' && $option !== 'void' && is_callable($option));
+        return ($option && is_callable($option));
     }
 
     /**
