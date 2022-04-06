@@ -42,9 +42,8 @@ final class Validation
 
     /** @var array */
     private static array $optionsDefault = [
-        'throwErrors'         => false,
-        'dropUnknownFields'   => true,
-        'useFieldNameAsLabel' => true,
+        'throwErrors' => false, 'useFieldNameAsLabel' => true,
+        'dropUnknownFields' => true, 'populateAbsentFields' => true,
     ];
 
     /**
@@ -118,13 +117,12 @@ final class Validation
     /**
      * Validate sanitizing given data.
      *
-     * @param  array      &$data              This will overridden.
-     * @param  array|null &$errors            Shortcut for call errors().
-     * @param  bool|null   $dropUnknownFields This will drop undefined data fields if true.
+     * @param  array      &$data   This will overridden.
+     * @param  array|null &$errors Shortcut for call errors().
      * @return bool
      * @throws froq\validation\{ValidationException|ValidationError}
      */
-    public function validate(array &$data, array &$errors = null, bool $dropUnknownFields = null): bool
+    public function validate(array &$data, array &$errors = null): bool
     {
         $errors = null; // @clear
 
@@ -136,13 +134,14 @@ final class Validation
         $ruleKeys = array_keys($rules);
 
         // Drop unknown data fields.
-        $dropUnknownFields ??= $this->options['dropUnknownFields'];
-        if ($dropUnknownFields) {
+        if ($this->options['dropUnknownFields']) {
             $data = array_include($data, $ruleKeys);
         }
 
         // Populate absent data fields with null.
-        $data = array_default($data, $ruleKeys, null);
+        if ($this->options['populateAbsentFields']) {
+            $data = array_default($data, $ruleKeys, null);
+        }
 
         $useFieldNameAsLabel = $this->options['useFieldNameAsLabel'];
 
