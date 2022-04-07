@@ -11,13 +11,10 @@ use froq\common\Error;
 use Throwable;
 
 /**
- * Validation Error.
- *
  * @package froq\validation
  * @object  froq\validation\ValidationError
  * @author  Kerem Güneş
  * @since   4.0, 4.3, 5.0
- * @static
  */
 class ValidationError extends Error
 {
