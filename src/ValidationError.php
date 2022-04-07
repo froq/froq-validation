@@ -23,21 +23,22 @@ class ValidationError extends Error
 {
     /**
      * Error codes.
+     *
      * @const int
      */
-    public const CALLBACK   = 1,
-                 REQUIRED   = 2,
-                 TYPE       = 3,
-                 LENGTH     = 4,
-                 EMAIL      = 5,
-                 ENUM       = 6,
-                 NOT_EQUAL  = 7,
-                 NOT_VALID  = 8,
-                 NOT_MATCH  = 9,
-                 MIN_VALUE  = 10,
-                 MAX_VALUE  = 11,
-                 MIN_LENGTH = 12,
-                 MAX_LENGTH = 13;
+    public final const CALLBACK   = 1,
+                       REQUIRED   = 2,
+                       TYPE       = 3,
+                       LENGTH     = 4,
+                       EMAIL      = 5,
+                       ENUM       = 6,
+                       NOT_EQUAL  = 7,
+                       NOT_VALID  = 8,
+                       NOT_MATCH  = 9,
+                       MIN_VALUE  = 10,
+                       MAX_VALUE  = 11,
+                       MIN_LENGTH = 12,
+                       MAX_LENGTH = 13;
 
     /** @var array */
     private array $errors;
