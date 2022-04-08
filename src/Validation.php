@@ -149,7 +149,7 @@ final class Validation
             // Nested.
             if ($rule instanceof Rules) {
                 foreach ((array) $rule as $rule) {
-                    $field      = $rule->field();
+                    $field      = $rule->field;
                     $fieldValue = $data[$key][$field] ?? null;
                     $fieldLabel = $useFieldNameAsLabel ? $key .'.'. $field : null;
 
@@ -168,7 +168,7 @@ final class Validation
             }
             // Single.
             elseif ($rule instanceof Rule) {
-                $field      = $rule->field();
+                $field      = $rule->field;
                 $fieldValue = $data[$field] ?? null;
                 $fieldLabel = $useFieldNameAsLabel ? $field : null;
 

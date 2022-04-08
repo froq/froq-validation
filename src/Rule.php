@@ -41,10 +41,10 @@ final class Rule
     ];
 
     /** @var string */
-    private string $field;
+    public readonly string $field;
 
     /** @var array */
-    private array $fieldOptions;
+    public readonly array $fieldOptions;
 
     /** @var ?array */
     private ?array $error = null;
@@ -131,26 +131,6 @@ final class Rule
 
         $this->field        = $field;
         $this->fieldOptions = ['field' => $field] + $fieldOptions;
-    }
-
-    /**
-     * Get field property.
-     *
-     * @return string
-     */
-    public function field(): string
-    {
-        return $this->field;
-    }
-
-    /**
-     * Get field-options property.
-     *
-     * @return array
-     */
-    public function fieldOptions(): array
-    {
-        return $this->fieldOptions;
     }
 
     /**
