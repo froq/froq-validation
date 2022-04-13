@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\common\Error;
 use Throwable;
 
 /**
@@ -16,7 +15,7 @@ use Throwable;
  * @author  Kerem Güneş
  * @since   4.0, 4.3, 5.0
  */
-class ValidationError extends Error
+class ValidationError extends \froq\common\Error
 {
     /**
      * Error codes.

@@ -10,7 +10,7 @@ namespace froq\validation;
 use froq\common\trait\OptionTrait;
 
 /**
- * Validation.
+ * Validation class that validates given rule sets.
  *
  * @package froq\validation
  * @object  froq\validation\Validation

@@ -11,7 +11,7 @@ use froq\validation\{Validation, ValidationError};
 use froq\common\trait\OptionTrait;
 
 /**
- * Validator.
+ * Base validator, extended by other validator classes.
  *
  * @package froq\validation\validator
  * @object  froq\validation\validator\Validator
@@ -249,7 +249,7 @@ abstract class Validator
             Validation::TYPE_DATE,
             Validation::TYPE_TIME,
             Validation::TYPE_DATETIME => new DateTimeValidator($options),
-            Validation::TYPE_UNIXTIME => new UnixtimeValidator($options),
+            Validation::TYPE_UNIXTIME => new UnixTimeValidator($options),
             Validation::TYPE_EMAIL    => new EmailValidator($options),
             Validation::TYPE_URL      => new UrlValidator($options),
             Validation::TYPE_UUID     => new UuidValidator($options),

@@ -7,15 +7,11 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\common\Exception;
-
 /**
- * Validation Exception.
- *
  * @package froq\validation
  * @object  froq\validation\ValidationException
  * @author  Kerem Güneş
  * @since   1.0
  */
-class ValidationException extends Exception
+class ValidationException extends \froq\common\Exception
 {}

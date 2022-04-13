@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace froq\validation\validator;
 
 /**
- * Validator Result.
+ * An internal class, used as validator result.
  *
  * @package froq\validation\validator
  * @object  froq\validation\validator\ValidatorResult

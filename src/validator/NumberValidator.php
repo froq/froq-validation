@@ -10,8 +10,6 @@ namespace froq\validation\validator;
 use froq\validation\{Validation, ValidationError};
 
 /**
- * Number Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\NumberValidator
  * @author  Kerem Güneş

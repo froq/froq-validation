@@ -10,14 +10,12 @@ namespace froq\validation\validator;
 use froq\validation\ValidationError;
 
 /**
- * Unixtime Validator.
- *
  * @package froq\validation\validator
- * @object  froq\validation\validator\UnixtimeValidator
+ * @object  froq\validation\validator\UnixTimeValidator
  * @author  Kerem Güneş
  * @since   6.0
  */
-class UnixtimeValidator extends Validator
+class UnixTimeValidator extends Validator
 {
     /**
      * @inheritDoc froq\validation\validator\Validator

@@ -10,8 +10,6 @@ namespace froq\validation\validator;
 use froq\validation\ValidationError;
 
 /**
- * Array Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\ArrayValidator
  * @author  Kerem Güneş

@@ -7,11 +7,9 @@ declare(strict_types=1);
 
 namespace froq\validation\validator;
 
-use froq\validation\{Validation, ValidationError};
+use froq\validation\ValidationError;
 
 /**
- * DateTime Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\DateTimeValidator
  * @author  Kerem Güneş

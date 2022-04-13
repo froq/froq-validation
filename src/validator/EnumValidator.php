@@ -10,8 +10,6 @@ namespace froq\validation\validator;
 use froq\validation\ValidationError;
 
 /**
- * Enum Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\EnumValidator
  * @author  Kerem Güneş

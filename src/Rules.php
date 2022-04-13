@@ -8,8 +8,6 @@ declare(strict_types=1);
 namespace froq\validation;
 
 /**
- * Rules.
- *
  * A rule set class, used by `Validation` class internally.
  *
  * @package froq\validation

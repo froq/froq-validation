@@ -10,8 +10,6 @@ namespace froq\validation\validator;
 use froq\validation\ValidationError;
 
 /**
- * Uuid Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\UuidValidator
  * @author  Kerem Güneş

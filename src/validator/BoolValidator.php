@@ -10,8 +10,6 @@ namespace froq\validation\validator;
 use froq\validation\ValidationError;
 
 /**
- * Bool Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\BoolValidator
  * @author  Kerem Güneş

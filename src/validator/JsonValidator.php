@@ -10,8 +10,6 @@ namespace froq\validation\validator;
 use froq\validation\ValidationError;
 
 /**
- * Json Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\JsonValidator
  * @author  Kerem Güneş

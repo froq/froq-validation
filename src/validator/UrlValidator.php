@@ -10,8 +10,6 @@ namespace froq\validation\validator;
 use froq\validation\ValidationError;
 
 /**
- * Url Validator.
- *
  * @package froq\validation\validator
  * @object  froq\validation\validator\UrlValidator
  * @author  Kerem Güneş

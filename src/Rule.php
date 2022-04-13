@@ -10,8 +10,6 @@ namespace froq\validation;
 use froq\validation\validator\{Validator, ValidatorResult};
 
 /**
- * Rule.
- *
  * A rule class, accepts a field & field options and is able to validate given
  * field input by its options, filling `$error` property with last occured error.
  *
