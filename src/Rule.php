@@ -56,7 +56,7 @@ final class Rule
      */
     public function __construct(string $field, array $fieldOptions)
     {
-        $field        || throw new ValidationException('Field name cannot be empty');
+        $field        || throw new ValidationException('Field cannot be empty');
         $fieldOptions || throw new ValidationException('Field options cannot be empty');
 
         [$type, $spec] = array_select($fieldOptions, ['type', 'spec']);
@@ -128,7 +128,7 @@ final class Rule
         }
 
         $this->field        = $field;
-        $this->fieldOptions = ['field' => $field] + $fieldOptions;
+        $this->fieldOptions = ['name' => $field] + $fieldOptions;
     }
 
     /**

@@ -36,14 +36,14 @@ class CallbackValidator extends Validator
             settype($this->input, $cast);
         }
 
-        /** @var string|array (ref) */
+        /** @var string|array (byref) */
         $error = null;
 
         if ($spec($this->input, $data, $error) === false) {
             $code    = ValidationError::CALLBACK;
             $message = format(
-                'Callback returned false for %q field.',
-                $this->options['field']
+                'Callback returned false for field %q.',
+                $this->options['name']
             );
 
             // Update error if callback changes it (by-ref).
