@@ -77,15 +77,15 @@ final class Validation
                 continue;
             }
 
-            // Nested (eg: [user => [image => [fields => [id => [type => string], url => [type => url], ..]]]]).
-            if (isset($rule['fields'])) {
-                if (empty($rule['fields'])) {
-                    throw new ValidationException('Rule `fields` must be a non-empty array');
-                } elseif (!is_array($rule['fields'])) {
-                    throw new ValidationException('Rule `fields` must be an array, %t given', $rule);
+            // Nested (eg: [user => [image => [@fields => [id => [type => string], url => [type => url], ..]]]]).
+            if (isset($rule['@fields'])) {
+                if (empty($rule['@fields'])) {
+                    throw new ValidationException('Rule `@fields` must be a non-empty array');
+                } elseif (!is_array($rule['@fields'])) {
+                    throw new ValidationException('Rule `@fields` must be an array, %t given', $rule);
                 }
 
-                $this->rules[$key] = new Rules($rule['fields']);
+                $this->rules[$key] = new Rules($rule['@fields']);
             }
             // Single (eg: [image => [id => [type => string], url => [type => url], ..]]).
             else {
@@ -148,7 +148,7 @@ final class Validation
         foreach ($rules as $key => $rule) {
             // Nested.
             if ($rule instanceof Rules) {
-                foreach ((array) $rule as $rule) {
+                foreach ($rule as $rule) {
                     $field      = $rule->field;
                     $fieldValue = $data[$key][$field] ?? null;
                     $fieldLabel = $useFieldNameAsLabel ? $key .'.'. $field : null;
