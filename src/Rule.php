@@ -149,7 +149,6 @@ final class Rule
      * @param  array|null            &$data   @internal
      * @param  ValidatorResult|null  &$result @internal
      * @return bool
-     * @throws froq\validation\ValidationException
      */
     public function okay(mixed &$input, string $inputLabel = null, array &$data = null, ValidatorResult &$result = null): bool
     {
