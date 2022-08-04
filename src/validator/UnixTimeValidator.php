@@ -43,7 +43,9 @@ class UnixTimeValidator extends Validator
                 // Pass.
             } else {
                 $stringInput = (string) $this->input;
-                if (!ctype_digit($stringInput) || strlen($stringInput) != strlen((string) time())) {
+                if (!ctype_digit($stringInput)
+                    // Checks only current times (use int for lesser times).
+                    || strlen($stringInput) != strlen((string) time())) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
                         '%s value is not a valid unixtime.',
