@@ -21,18 +21,6 @@ use froq\validation\validator\{Validator, ValidatorResult};
 final class Rule
 {
     /** @const array */
-    public const AVAILABLE_TYPES = [
-        Validation::TYPE_INT,      Validation::TYPE_FLOAT,
-        Validation::TYPE_NUMBER,   Validation::TYPE_NUMERIC,
-        Validation::TYPE_STRING,   Validation::TYPE_ENUM,
-        Validation::TYPE_EMAIL,    Validation::TYPE_DATE,
-        Validation::TYPE_TIME,     Validation::TYPE_DATETIME,
-        Validation::TYPE_UNIXTIME, Validation::TYPE_JSON,
-        Validation::TYPE_URL,      Validation::TYPE_UUID,
-        Validation::TYPE_BOOL,     Validation::TYPE_ARRAY,
-    ];
-
-    /** @const array */
     public const BOOLABLE_OPTIONS = [
         'required', 'unsigned', 'dashed', 'cased',
         'nullable', 'strict', 'drop',
@@ -62,12 +50,12 @@ final class Rule
         [$type, $spec] = array_select($fieldOptions, ['type', 'spec']);
 
         if ($type) {
-            if (!in_array($type, self::AVAILABLE_TYPES, true)) {
+            if (!in_array($type, ValidationType::all(), true)) {
                 throw new ValidationException(
                     'Option `type` is invalid (given type: %s, available types: %a)',
-                    [$type, self::AVAILABLE_TYPES]
+                    [$type, ValidationType::all()]
                 );
-            } elseif (!$spec && $type == Validation::TYPE_ENUM) {
+            } elseif (!$spec && $type == ValidationType::ENUM) {
                 throw new ValidationException(
                     'Option `type.%s` requires `spec` definition as array in options (field: %s)',
                     [$type, $field]
@@ -76,22 +64,22 @@ final class Rule
 
             // Set spec for date/time stuff if none given.
             $spec || $spec = match ($type) {
-                Validation::TYPE_DATE     => 'Y-m-d',
-                Validation::TYPE_TIME     => 'H:i:s',
-                Validation::TYPE_DATETIME => 'Y-m-d H:i:s',
-                default                   => $spec
+                ValidationType::DATE     => 'Y-m-d',
+                ValidationType::TIME     => 'H:i:s',
+                ValidationType::DATETIME => 'Y-m-d H:i:s',
+                default                  => $spec
             };
         }
 
         if ($spec) {
             $specType = get_type($spec);
 
-            if ($type == Validation::TYPE_ENUM && !equal($specType, 'array')) {
+            if ($type == ValidationType::ENUM && !equal($specType, 'array')) {
                 throw new ValidationException(
                     'Invalid `spec` given, only an array accepted for enum types (field: %s)',
                     $field
                 );
-            } elseif ($type == Validation::TYPE_JSON && !equal($spec, 'array', 'object')) {
+            } elseif ($type == ValidationType::JSON && !equal($spec, 'array', 'object')) {
                 throw new ValidationException(
                     'Invalid `spec` given, only array and object accepted for json types (field: %s)',
                     $field

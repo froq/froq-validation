@@ -21,19 +21,6 @@ final class Validation
 {
     use OptionTrait;
 
-    /**
-     * Types.
-     * @const string
-     */
-    public const TYPE_INT      = 'int',      TYPE_FLOAT    = 'float',
-                 TYPE_NUMBER   = 'number',   TYPE_NUMERIC  = 'numeric',
-                 TYPE_STRING   = 'string',   TYPE_ENUM     = 'enum',
-                 TYPE_EMAIL    = 'email',    TYPE_DATE     = 'date',
-                 TYPE_TIME     = 'time',     TYPE_DATETIME = 'datetime',
-                 TYPE_UNIXTIME = 'unixtime', TYPE_JSON     = 'json',
-                 TYPE_URL      = 'url',      TYPE_UUID     = 'uuid',
-                 TYPE_BOOL     = 'bool',     TYPE_ARRAY    = 'array';
-
     /** @var array */
     private array $rules;
 

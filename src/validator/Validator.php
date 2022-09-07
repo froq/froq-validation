@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace froq\validation\validator;
 
-use froq\validation\{Validation, ValidationError};
+use froq\validation\{ValidationType, ValidationError};
 use froq\common\trait\OptionTrait;
 
 /**
@@ -240,22 +240,22 @@ abstract class Validator
         }
 
         return match ($options['type']) {
-            Validation::TYPE_INT,
-            Validation::TYPE_FLOAT,
-            Validation::TYPE_NUMBER,
-            Validation::TYPE_NUMERIC  => new NumberValidator($options),
-            Validation::TYPE_STRING   => new StringValidator($options),
-            Validation::TYPE_ENUM     => new EnumValidator($options),
-            Validation::TYPE_DATE,
-            Validation::TYPE_TIME,
-            Validation::TYPE_DATETIME => new DateTimeValidator($options),
-            Validation::TYPE_UNIXTIME => new UnixTimeValidator($options),
-            Validation::TYPE_EMAIL    => new EmailValidator($options),
-            Validation::TYPE_URL      => new UrlValidator($options),
-            Validation::TYPE_UUID     => new UuidValidator($options),
-            Validation::TYPE_JSON     => new JsonValidator($options),
-            Validation::TYPE_BOOL     => new BoolValidator($options),
-            Validation::TYPE_ARRAY    => new ArrayValidator($options),
+            ValidationType::INT,
+            ValidationType::FLOAT,
+            ValidationType::NUMBER,
+            ValidationType::NUMERIC  => new NumberValidator($options),
+            ValidationType::STRING   => new StringValidator($options),
+            ValidationType::ENUM     => new EnumValidator($options),
+            ValidationType::DATE,
+            ValidationType::TIME,
+            ValidationType::DATETIME => new DateTimeValidator($options),
+            ValidationType::UNIXTIME => new UnixTimeValidator($options),
+            ValidationType::EMAIL    => new EmailValidator($options),
+            ValidationType::URL      => new UrlValidator($options),
+            ValidationType::UUID     => new UuidValidator($options),
+            ValidationType::JSON     => new JsonValidator($options),
+            ValidationType::BOOL     => new BoolValidator($options),
+            ValidationType::ARRAY    => new ArrayValidator($options),
 
             // Not implemented.
             default => throw new ValidatorException('Invalid type `%s`', $options['type'])

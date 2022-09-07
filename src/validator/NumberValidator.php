@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace froq\validation\validator;
 
-use froq\validation\{Validation, ValidationError};
+use froq\validation\{ValidationType, ValidationError};
 
 /**
  * @package froq\validation\validator
@@ -40,9 +40,9 @@ class NumberValidator extends Validator
         } else {
             // Cast int/float.
             $this->input = match ($type) {
-                Validation::TYPE_INT   => (int) $this->input,
-                Validation::TYPE_FLOAT => (float) $this->input,
-                default                => $this->input += 0
+                ValidationType::INT   => (int) $this->input,
+                ValidationType::FLOAT => (float) $this->input,
+                default               => $this->input += 0
             };
 
             [$unsigned, $precision, $equal] = $this->getOptions(['unsigned', 'precision', 'equal']);
@@ -92,6 +92,7 @@ class NumberValidator extends Validator
      */
     private function checkType(string $type): bool
     {
+        // Function (eg: is_int, is_float, is_number or is_numeric).
         $check = 'is_' . ($this->getOption('strict') ? $type : 'numeric');
 
         return $check($this->input);
