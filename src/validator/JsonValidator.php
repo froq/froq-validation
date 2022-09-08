@@ -49,24 +49,26 @@ class JsonValidator extends Validator
                         '%s value is not a valid JSON array.',
                         $this->inputLabel
                     );
+
+                    return $this->result;
                 } elseif ($spec == 'object' && $wrap != '{}') {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
                         '%s value is not a valid JSON object.',
                         $this->inputLabel
                     );
-                }
-            } else {
-                // Try parsing.
-                json_decode($this->input);
 
-                if (json_last_error()) {
-                    $this->result->error = $this->error(
-                        ValidationError::NOT_VALID,
-                        '%s value is not a valid JSON input.',
-                        $this->inputLabel
-                    );
+                    return $this->result;
                 }
+            }
+
+            // Try real validation.
+            if (!json_validate($this->input)) {
+                $this->result->error = $this->error(
+                    ValidationError::NOT_VALID,
+                    '%s value is not a valid JSON input.',
+                    $this->inputLabel
+                );
             }
         }
 
