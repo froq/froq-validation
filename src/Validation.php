@@ -10,7 +10,7 @@ namespace froq\validation;
 use froq\common\trait\OptionTrait;
 
 /**
- * Validation class that validates given rule sets.
+ * Validation class, runs validations by given rule sets.
  *
  * @package froq\validation
  * @object  froq\validation\Validation
@@ -49,8 +49,8 @@ final class Validation
     /**
      * Set rules.
      *
-     * This method can be used in `init()` method in current controller in order to set or
-     * reset the rules after getting them from database, a config file etc.
+     * This method can be used in `init()` method in controller classes in order to set
+     * or reset the rules after getting them from database, a config file etc.
      *
      * @param  array $rules
      * @return void
