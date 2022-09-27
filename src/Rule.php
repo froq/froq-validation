@@ -22,8 +22,7 @@ final class Rule
 {
     /** @const array */
     public const BOOLABLE_OPTIONS = [
-        'required', 'unsigned', 'dashed', 'cased',
-        'nullable', 'strict', 'drop',
+        'required', 'unsigned', 'nullable', 'strict', 'drop',
     ];
 
     /** @var string */
