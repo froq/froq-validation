@@ -81,8 +81,8 @@ class UuidValidator extends Validator
      */
     private function checkNull(): bool
     {
-        return ($this->input === '00000000000000000000000000000000')
-            || ($this->input === '00000000-0000-0000-0000-000000000000');
+        return hash_equals('00000000000000000000000000000000', $this->input)
+            || hash_equals('00000000-0000-0000-0000-000000000000', $this->input);
     }
 
     /**
