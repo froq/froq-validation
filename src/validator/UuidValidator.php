@@ -47,59 +47,27 @@ class UuidValidator extends Validator
                     );
                 }
             } else {
-                [$null, $dashed, $cased] = $this->getOptions(['null', 'dashed', 'cased']);
+                [$null, $strict] = $this->getOptions(['null', 'strict']);
+
+                $uuid = new \Uuid($this->input);
 
                 // Accept null UUIDs? @default=false
-                if (!$null && $this->checkNull()) {
+                if (!$null && ($uuid->isNull() || $uuid->isNullHash())) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
                         '%s value is not a valid UUID, null UUID given.',
                         $this->inputLabel
                     );
-                } else {
-                    isset($dashed) && $dashed = (bool) $dashed;
-                    isset($cased)  && $cased  = (bool) $cased;
-
-                    $pattern = $this->getPattern($dashed, $cased);
-
-                    if (!$this->isMatch($pattern)) {
-                        $this->result->error = $this->error(
-                            ValidationError::NOT_VALID,
-                            '%s value is not a valid UUID.',
-                            $this->inputLabel
-                        );
-                    }
+                } elseif (!$uuid->isValid((bool) $strict)) {
+                    $this->result->error = $this->error(
+                        ValidationError::NOT_VALID,
+                        '%s value is not a valid UUID.',
+                        $this->inputLabel
+                    );
                 }
             }
         }
 
         return $this->result;
-    }
-
-    /**
-     * Check null input.
-     */
-    private function checkNull(): bool
-    {
-        return hash_equals('00000000000000000000000000000000', $this->input)
-            || hash_equals('00000000-0000-0000-0000-000000000000', $this->input);
-    }
-
-    /**
-     * Get pattern by options.
-     */
-    private function getPattern(?bool $dashed, ?bool $cased): string
-    {
-        // Accept non-dashed UUIDs or both? @default=both
-        $pattern = match ($dashed) {
-            true    => '~^(?:[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12})$~',
-            false   => '~^(?:[A-F0-9]{32})$~',
-            default => '~^(?:[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}|[A-F0-9]{32})$~'
-        };
-
-        // Case insensitive?
-        $cased || $pattern .= 'i';
-
-        return $pattern;
     }
 }
