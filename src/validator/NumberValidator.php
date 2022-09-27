@@ -64,7 +64,7 @@ class NumberValidator extends Validator
 
                 if ($range !== null && ($this->input < $range[0] || $this->input > $range[1])) {
                     $this->result->error = $this->error(
-                        ValidationError::MIN_VALUE,
+                        ValidationError::NOT_VALID,
                         '%s value must be between %s and %s.',
                         $this->inputLabel, $range[0], $range[1]
                     );
