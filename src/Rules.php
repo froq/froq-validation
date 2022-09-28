@@ -7,12 +7,8 @@ declare(strict_types=1);
 
 namespace froq\validation;
 
-use froq\validation\{ValidationException, Rule};
-
 /**
- * Rules.
- *
- * Represents a rule set entity which used by `Validation` class internally.
+ * A rule set class, used by `Validation` class internally.
  *
  * @package froq\validation
  * @object  froq\validation\Rules
@@ -20,22 +16,23 @@ use froq\validation\{ValidationException, Rule};
  * @since   4.3
  * @internal
  */
-final class Rules
+final class Rules extends \stdClass
 {
     /**
      * Constructor.
      *
-     * @param array<string, array> $rules
+     * @param  array $rules
+     * @throws froq\validation\ValidationException
      */
     public function __construct(array $rules)
     {
         foreach ($rules as $field => $fieldOptions) {
             is_string($field) || throw new ValidationException(
-                'Field name must a string, %s given', get_type($field)
+                'Field name must a string, %t given', $field
             );
 
             // Simply set rules with keys as property.
-            $this->{$field} = new Rule($field, $fieldOptions);
+            $this->$field = new Rule($field, $fieldOptions);
         }
     }
 }
