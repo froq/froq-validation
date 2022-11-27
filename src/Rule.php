@@ -51,12 +51,12 @@ final class Rule
         if ($type) {
             if (!in_array($type, ValidationType::all(), true)) {
                 throw new ValidationException(
-                    'Option `type` is invalid (given type: %s, available types: %a)',
+                    'Option "type" is invalid (given type: %s, available types: %a)',
                     [$type, ValidationType::all()]
                 );
             } elseif (!$spec && $type == ValidationType::ENUM) {
                 throw new ValidationException(
-                    'Option `type.%s` requires `spec` definition as array in options (field: %s)',
+                    'Option "type.%s" requires "spec" definition as array in options (field: %s)',
                     [$type, $field]
                 );
             }
@@ -75,12 +75,12 @@ final class Rule
 
             if ($type == ValidationType::ENUM && !equal($specType, 'array')) {
                 throw new ValidationException(
-                    'Invalid `spec` given, only an array accepted for enum types (field: %s)',
+                    'Invalid "spec" given, only an array accepted for enum types (field: %s)',
                     $field
                 );
             } elseif ($type == ValidationType::JSON && !equal($spec, 'array', 'object')) {
                 throw new ValidationException(
-                    'Invalid `spec` given, only array and object accepted for json types (field: %s)',
+                    'Invalid "spec" given, only array and object accepted for json types (field: %s)',
                     $field
                 );
             }

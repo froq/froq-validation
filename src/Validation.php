@@ -67,9 +67,9 @@ final class Validation
             // Nested (eg: [user => [image => [@fields => [id => [type => string], url => [type => url], ..]]]]).
             if (isset($rule['@fields'])) {
                 if (empty($rule['@fields'])) {
-                    throw new ValidationException('Rule `@fields` must be a non-empty array');
+                    throw new ValidationException('Rule @fields must be a non-empty array');
                 } elseif (!is_array($rule['@fields'])) {
-                    throw new ValidationException('Rule `@fields` must be an array, %t given', $rule);
+                    throw new ValidationException('Rule @fields must be an array, %t given', $rule);
                 }
 
                 $this->rules[$key] = new Rules($rule['@fields']);

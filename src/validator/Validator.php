@@ -258,7 +258,7 @@ abstract class Validator
             ValidationType::ARRAY    => new ArrayValidator($options),
 
             // Not implemented.
-            default => throw new ValidatorException('Invalid type `%s`', $options['type'])
+            default => throw new ValidatorException('Invalid type %q', $options['type'])
         };
     }
 
