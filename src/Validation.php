@@ -29,8 +29,8 @@ final class Validation
 
     /** @var array */
     private static array $optionsDefault = [
-        'throwErrors' => false, 'useFieldNameAsLabel' => true,
-        'dropUnknownFields' => true, 'populateAbsentFields' => true,
+        'throwErrors'       => false, 'useFieldNameAsLabel'  => true,
+        'dropUnknownFields' => true,  'populateAbsentFields' => true,
     ];
 
     /**
