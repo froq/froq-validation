@@ -96,7 +96,7 @@ abstract class Validator
      *
      * @return void
      */
-    protected final function prepare(): void
+    protected function prepare(): void
     {
         $this->result = new ValidatorResult();
 
@@ -158,7 +158,7 @@ abstract class Validator
      * @param  mixed $option
      * @return bool
      */
-    protected final function isBlank(): bool
+    protected function isBlank(): bool
     {
         return ($this->input === '' || $this->input === null);
     }
@@ -169,7 +169,7 @@ abstract class Validator
      * @param  mixed $option
      * @return bool
      */
-    protected final function isTrue(mixed $option): bool
+    protected function isTrue(mixed $option): bool
     {
         return ($option && ($option === true || (is_scalar($option) && strval($option) === '1')));
     }
@@ -180,7 +180,7 @@ abstract class Validator
      * @param  mixed $option
      * @return bool
      */
-    protected final function isCallable(mixed $option): bool
+    protected function isCallable(mixed $option): bool
     {
         return ($option && is_callable($option));
     }
@@ -191,7 +191,7 @@ abstract class Validator
      * @param  string $type
      * @return bool
      */
-    protected final function isType(string $type): bool
+    protected function isType(string $type): bool
     {
         return is_type_of($this->input, $type);
     }
@@ -202,7 +202,7 @@ abstract class Validator
      * @param  string $spec
      * @return bool
      */
-    protected final function isMatch(string $spec): bool
+    protected function isMatch(string $spec): bool
     {
         return preg_test($spec, $this->input);
     }
@@ -215,7 +215,7 @@ abstract class Validator
      * @param  mixed  ...$messageParams
      * @return array
      */
-    protected final function error(int $code, string $message, mixed ...$messageParams): array
+    protected function error(int $code, string $message, mixed ...$messageParams): array
     {
         if ($messageParams) {
             $message = format($message, ...$messageParams);
@@ -231,7 +231,7 @@ abstract class Validator
      * @return froq\validation\validator\Validator
      * @throws froq\validation\validator\ValidatorException
      */
-    public static final function create(array $options): Validator
+    public static function create(array $options): Validator
     {
         // Callback spec overrides all validators.
         if (value($options, 'specType') === 'callback'

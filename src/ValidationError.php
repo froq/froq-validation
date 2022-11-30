@@ -63,7 +63,7 @@ class ValidationError extends \froq\common\Error
      * @return array|null
      * @since  5.0
      */
-    public final function errors(): array|null
+    public function errors(): array|null
     {
         return $this->errors ?? null;
     }
