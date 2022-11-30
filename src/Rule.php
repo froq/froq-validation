@@ -20,18 +20,16 @@ use froq\validation\validator\{Validator, ValidatorResult};
  */
 final class Rule
 {
-    /** @const array */
-    public const BOOLABLE_OPTIONS = [
-        'required', 'unsigned', 'nullable', 'strict', 'drop',
-    ];
+    /** Boolable options (given with no keys). */
+    public const BOOLABLE_OPTIONS = ['required', 'unsigned', 'nullable', 'strict', 'drop'];
 
-    /** @var string */
+    /** Field name. */
     public readonly string $field;
 
-    /** @var array */
+    /** Field options. */
     public readonly array $fieldOptions;
 
-    /** @var ?array */
+    /** Error. */
     private ?array $error = null;
 
     /**
@@ -121,9 +119,9 @@ final class Rule
     /**
      * Get error property.
      *
-     * @return ?array
+     * @return array|null
      */
-    public function error(): ?array
+    public function error(): array|null
     {
         return $this->error;
     }

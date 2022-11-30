@@ -22,21 +22,12 @@ class ValidationError extends \froq\common\Error
      *
      * @const int
      */
-    public final const CALLBACK   = 1,
-                       REQUIRED   = 2,
-                       TYPE       = 3,
-                       LENGTH     = 4,
-                       EMAIL      = 5,
-                       ENUM       = 6,
-                       NOT_EQUAL  = 7,
-                       NOT_VALID  = 8,
-                       NOT_MATCH  = 9,
-                       MIN_VALUE  = 10,
-                       MAX_VALUE  = 11,
-                       MIN_LENGTH = 12,
-                       MAX_LENGTH = 13;
+    public const CALLBACK   = 1,  REQUIRED   = 2,  TYPE       = 3,  LENGTH     = 4,
+                 EMAIL      = 5,  ENUM       = 6,  NOT_EQUAL  = 7,  NOT_VALID  = 8,
+                 NOT_MATCH  = 9,  MIN_VALUE  = 10, MAX_VALUE  = 11, MIN_LENGTH = 12,
+                 MAX_LENGTH = 13;
 
-    /** @var array */
+    /** Errors. */
     private array $errors;
 
     /**
@@ -69,10 +60,10 @@ class ValidationError extends \froq\common\Error
     /**
      * Get errors.
      *
-     * @return ?array
+     * @return array|null
      * @since  5.0
      */
-    public final function errors(): ?array
+    public final function errors(): array|null
     {
         return $this->errors ?? null;
     }

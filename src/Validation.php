@@ -21,13 +21,13 @@ final class Validation
 {
     use OptionTrait;
 
-    /** @var array */
+    /** Rules. */
     private array $rules;
 
-    /** @var array */
+    /** Errors. */
     private array $errors;
 
-    /** @var array */
+    /** Default options. */
     private static array $optionsDefault = [
         'throwErrors'       => false, 'useFieldNameAsLabel'  => true,
         'dropUnknownFields' => true,  'populateAbsentFields' => true,

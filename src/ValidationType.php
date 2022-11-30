@@ -33,7 +33,7 @@ final class ValidationType
     /**
      * Get all types.
      *
-     * @return array
+     * @return array<string>
      */
     public static function all(): array
     {

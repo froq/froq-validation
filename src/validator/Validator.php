@@ -22,13 +22,13 @@ abstract class Validator
 {
     use OptionTrait;
 
-    /** @var mixed */
+    /** Input to validate. */
     protected mixed $input;
 
-    /** @var string */
+    /** Input label as error info. */
     protected string $inputLabel;
 
-    /** @var froq\validation\validator\ValidatorResult */
+    /** Result instance. */
     protected readonly ValidatorResult $result;
 
     /**
