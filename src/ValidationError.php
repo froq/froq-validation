@@ -17,11 +17,7 @@ use Throwable;
  */
 class ValidationError extends \froq\common\Error
 {
-    /**
-     * Error codes.
-     *
-     * @const int
-     */
+    /** Error codes. */
     public const CALLBACK   = 1,  REQUIRED   = 2,  TYPE       = 3,  LENGTH     = 4,
                  EMAIL      = 5,  ENUM       = 6,  NOT_EQUAL  = 7,  NOT_VALID  = 8,
                  NOT_MATCH  = 9,  MIN_VALUE  = 10, MAX_VALUE  = 11, MIN_LENGTH = 12,
