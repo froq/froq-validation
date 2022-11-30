@@ -22,10 +22,10 @@ final class Validation
     use OptionTrait;
 
     /** Rules. */
-    private array $rules;
+    private array $rules = [];
 
     /** Errors. */
-    private array $errors;
+    private ?array $errors = null;
 
     /** Default options. */
     private static array $optionsDefault = [
@@ -84,21 +84,21 @@ final class Validation
     /**
      * Get rules.
      *
-     * @return ?array
+     * @return array
      */
-    public function getRules(): ?array
+    public function getRules(): array
     {
-        return $this->rules ?? null;
+        return $this->rules;
     }
 
     /**
      * Get errors property.
      *
-     * @return ?array
+     * @return array
      */
-    public function errors(): ?array
+    public function errors(): array|null
     {
-        return $this->errors ?? null;
+        return $this->errors;
     }
 
     /**
