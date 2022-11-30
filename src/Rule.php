@@ -18,7 +18,7 @@ use froq\validation\validator\{Validator, ValidatorResult};
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Rule
+class Rule
 {
     /** Boolable options (given with no keys). */
     public const BOOLABLE_OPTIONS = ['required', 'unsigned', 'nullable', 'strict', 'drop'];

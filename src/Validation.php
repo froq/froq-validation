@@ -17,7 +17,7 @@ use froq\common\trait\OptionTrait;
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Validation
+class Validation
 {
     use OptionTrait;
 

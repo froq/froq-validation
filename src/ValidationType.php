@@ -15,7 +15,7 @@ namespace froq\validation;
  * @author  Kerem Güneş
  * @since   6.0
  */
-final class ValidationType
+class ValidationType
 {
     /**
      * Types.

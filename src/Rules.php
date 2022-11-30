@@ -16,7 +16,7 @@ namespace froq\validation;
  * @since   4.3
  * @internal
  */
-final class Rules extends \stdClass
+class Rules extends \stdClass
 {
     /**
      * Constructor.
