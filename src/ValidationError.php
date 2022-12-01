@@ -45,7 +45,7 @@ class ValidationError extends \froq\common\Error
             $this->errors = ['code' => $code, 'message' => $message];
         }
 
-        parent::__construct($message, $messageParams, $code, $previous);
+        parent::__construct($message, $messageParams, $code);
     }
 
     /**
