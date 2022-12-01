@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation;
 
 /**
  * A rule set class, used by `Validation` class internally.
  *
  * @package froq\validation
- * @object  froq\validation\Rules
+ * @class   froq\validation\Rules
  * @author  Kerem Güneş
  * @since   4.3
  * @internal

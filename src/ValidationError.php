@@ -1,17 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation;
-
-use Throwable;
 
 /**
  * @package froq\validation
- * @object  froq\validation\ValidationError
+ * @class   froq\validation\ValidationError
  * @author  Kerem Güneş
  * @since   4.0, 4.3, 5.0
  */
@@ -24,7 +20,7 @@ class ValidationError extends \froq\common\Error
                  MAX_LENGTH = 13;
 
     /** Errors. */
-    private array $errors;
+    private ?array $errors = null;
 
     /**
      * Constructor.
@@ -33,11 +29,10 @@ class ValidationError extends \froq\common\Error
      * @param mixed|null            $messageParams
      * @param int|null              $code
      * @param array|null            $errors
-     * @param Throwable|null        $previous
      * @since 5.0
      */
-    public function __construct(string|Throwable $message = null, mixed $messageParams = null, int $code = null,
-        array $errors = null, Throwable $previous = null)
+    public function __construct(string|\Throwable $message = null, mixed $messageParams = null, int $code = null,
+        array $errors = null)
     {
         if ($errors !== null) {
             $this->errors = $errors;
@@ -61,7 +56,7 @@ class ValidationError extends \froq\common\Error
      */
     public function errors(): array|null
     {
-        return $this->errors ?? null;
+        return $this->errors;
     }
 
     /**

@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation;
 
 use froq\common\trait\OptionTrait;
@@ -13,7 +11,7 @@ use froq\common\trait\OptionTrait;
  * Validation class, runs validations by given rule sets.
  *
  * @package froq\validation
- * @object  froq\validation\Validation
+ * @class   froq\validation\Validation
  * @author  Kerem Güneş
  * @since   1.0
  */
@@ -94,7 +92,7 @@ class Validation
     /**
      * Get errors property.
      *
-     * @return array
+     * @return array|null
      */
     public function errors(): array|null
     {

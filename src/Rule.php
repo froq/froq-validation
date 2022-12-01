@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation;
 
 use froq\validation\validator\{Validator, ValidatorResult};
@@ -14,7 +12,7 @@ use froq\validation\validator\{Validator, ValidatorResult};
  * field input by its options, filling `$error` property with last occured error.
  *
  * @package froq\validation
- * @object  froq\validation\Rule
+ * @class   froq\validation\Rule
  * @author  Kerem Güneş
  * @since   1.0
  */
@@ -52,7 +50,7 @@ class Rule
                     'Option "type" is invalid (given type: %s, available types: %a)',
                     [$type, ValidationType::all()]
                 );
-            } elseif (!$spec && $type == ValidationType::ENUM) {
+            } elseif (!$spec && $type === ValidationType::ENUM) {
                 throw new ValidationException(
                     'Option "type.%s" requires "spec" definition as array in options (field: %s)',
                     [$type, $field]
@@ -71,12 +69,12 @@ class Rule
         if ($spec) {
             $specType = get_type($spec);
 
-            if ($type == ValidationType::ENUM && !equal($specType, 'array')) {
+            if ($type === ValidationType::ENUM && !equal($specType, 'array')) {
                 throw new ValidationException(
                     'Invalid "spec" given, only an array accepted for enum types (field: %s)',
                     $field
                 );
-            } elseif ($type == ValidationType::JSON && !equal($spec, 'array', 'object')) {
+            } elseif ($type === ValidationType::JSON && !equal($spec, 'array', 'object')) {
                 throw new ValidationException(
                     'Invalid "spec" given, only array and object accepted for json types (field: %s)',
                     $field
@@ -88,7 +86,7 @@ class Rule
                 $specType = 'callback';
             } else {
                 // Detect regexp spec.
-                if ($specType == 'string' && $spec[0] == '~') {
+                if ($specType === 'string' && $spec[0] === '~') {
                     $specType = 'regexp';
                 } elseif ($spec instanceof \RegExp) {
                     $spec     = $spec->pattern;
@@ -144,6 +142,8 @@ class Rule
                     ?? format('Field %q', $inLabel ?? $this->field)
             );
 
+        $this->error = null;
+
         $result = $validator->validate($data);
         if ($error = $result->error) {
             $this->error = $error;
@@ -151,6 +151,6 @@ class Rule
             $input = $validator->getInput();
         }
 
-        return ($this->error == null);
+        return ($this->error === null);
     }
 }

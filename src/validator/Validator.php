@@ -1,20 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\{ValidationType, ValidationError};
 use froq\common\trait\OptionTrait;
 
 /**
- * Base validator, extended by other validator classes.
+ * Base validator, extended by validator classes.
  *
  * @package froq\validation\validator
- * @object  froq\validation\validator\Validator
+ * @class   froq\validation\validator\Validator
  * @author  Kerem Güneş
  * @since   6.0
  */
@@ -235,7 +233,7 @@ abstract class Validator
     {
         // Callback spec overrides all validators.
         if (value($options, 'specType') === 'callback'
-            or value($options, 'spec') instanceof \Closure) {
+            || value($options, 'spec') instanceof \Closure) {
             return new CallbackValidator($options);
         }
 
