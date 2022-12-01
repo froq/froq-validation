@@ -247,7 +247,7 @@ abstract class Validator
             ValidationType::DATE,
             ValidationType::TIME,
             ValidationType::DATETIME => new DateTimeValidator($options),
-            ValidationType::UNIXTIME => new UnixTimeValidator($options),
+            ValidationType::EPOCH    => new EpochValidator($options),
             ValidationType::EMAIL    => new EmailValidator($options),
             ValidationType::URL      => new UrlValidator($options),
             ValidationType::UUID     => new UuidValidator($options),
