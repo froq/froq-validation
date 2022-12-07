@@ -265,5 +265,5 @@ abstract class Validator
      *
      * @return froq\validation\validator\ValidatorResult
      */
-    public abstract function validate(): ValidatorResult;
+    abstract public function validate(): ValidatorResult;
 }
