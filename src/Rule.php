@@ -127,10 +127,10 @@ class Rule
     /**
      * Validate given input, sanitizing/modifying it with given type in field options.
      *
-     * @param  mixed                 &$input
-     * @param  string|null            $inputLabel
-     * @param  array|null            &$data   @internal
-     * @param  ValidatorResult|null  &$result @internal
+     * @param  mixed                &$input
+     * @param  string|null           $inputLabel
+     * @param  array|null           &$data   @internal
+     * @param  ValidatorResult|null &$result @internal
      * @return bool
      */
     public function okay(mixed &$input, string $inputLabel = null, array &$data = null, ValidatorResult &$result = null): bool
