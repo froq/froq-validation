@@ -139,9 +139,10 @@ class Rule
             ->setInput($input)
             ->setInputLabel(
                 $this->fieldOptions['label']
-                    ?? format('Field %q', $inLabel ?? $this->field)
+                    ?? format('Field %q', $inputLabel ?? $this->field)
             );
 
+        // Reset (in case).
         $this->error = null;
 
         $result = $validator->validate($data);
