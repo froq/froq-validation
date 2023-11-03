@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\ValidationError;
 
 /**
  * @package froq\validation\validator
- * @object  froq\validation\validator\JsonValidator
+ * @class   froq\validation\validator\JsonValidator
  * @author  Kerem Güneş
  * @since   6.0
  */
@@ -24,8 +22,7 @@ class JsonValidator extends Validator
     {
         $this->prepare();
 
-        if ($this->result->isDropped()
-            || $this->result->isReturned()) {
+        if ($this->result->isDropped() || $this->result->isReturned()) {
             return $this->result;
         }
 
@@ -43,7 +40,7 @@ class JsonValidator extends Validator
                 $wrap = ($this->input[0] ?? '')
                       . ($this->input[-1] ?? '');
 
-                if ($spec == 'array' && $wrap != '[]') {
+                if ($spec === 'array' && $wrap !== '[]') {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
                         '%s value is not a valid JSON array.',
@@ -51,7 +48,7 @@ class JsonValidator extends Validator
                     );
 
                     return $this->result;
-                } elseif ($spec == 'object' && $wrap != '{}') {
+                } elseif ($spec === 'object' && $wrap !== '{}') {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
                         '%s value is not a valid JSON object.',

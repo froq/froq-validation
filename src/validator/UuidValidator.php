@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\ValidationError;
 
 /**
  * @package froq\validation\validator
- * @object  froq\validation\validator\UuidValidator
+ * @class   froq\validation\validator\UuidValidator
  * @author  Kerem Güneş
  * @since   6.0
  */
@@ -24,8 +22,7 @@ class UuidValidator extends Validator
     {
         $this->prepare();
 
-        if ($this->result->isDropped()
-            || $this->result->isReturned()) {
+        if ($this->result->isDropped() || $this->result->isReturned()) {
             return $this->result;
         }
 
@@ -38,7 +35,7 @@ class UuidValidator extends Validator
         } else {
             [$spec, $specType] = $this->getOptions(['spec', 'specType']);
 
-            if ($spec && $specType == 'regexp') {
+            if ($spec && $specType === 'regexp') {
                 if (!$this->isMatch($spec)) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_MATCH,

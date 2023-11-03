@@ -1,20 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\{ValidationType, ValidationError};
 use froq\common\trait\OptionTrait;
 
 /**
- * Base validator, extended by other validator classes.
+ * Base validator, extended by validator classes.
  *
  * @package froq\validation\validator
- * @object  froq\validation\validator\Validator
+ * @class   froq\validation\validator\Validator
  * @author  Kerem Güneş
  * @since   6.0
  */
@@ -22,13 +20,13 @@ abstract class Validator
 {
     use OptionTrait;
 
-    /** @var mixed */
+    /** Input to validate. */
     protected mixed $input;
 
-    /** @var string */
+    /** Input label as error info. */
     protected string $inputLabel;
 
-    /** @var froq\validation\validator\ValidatorResult */
+    /** Result instance. */
     protected readonly ValidatorResult $result;
 
     /**
@@ -96,7 +94,7 @@ abstract class Validator
      *
      * @return void
      */
-    protected final function prepare(): void
+    protected function prepare(): void
     {
         $this->result = new ValidatorResult();
 
@@ -158,7 +156,7 @@ abstract class Validator
      * @param  mixed $option
      * @return bool
      */
-    protected final function isBlank(): bool
+    protected function isBlank(): bool
     {
         return ($this->input === '' || $this->input === null);
     }
@@ -169,7 +167,7 @@ abstract class Validator
      * @param  mixed $option
      * @return bool
      */
-    protected final function isTrue(mixed $option): bool
+    protected function isTrue(mixed $option): bool
     {
         return ($option && ($option === true || (is_scalar($option) && strval($option) === '1')));
     }
@@ -180,7 +178,7 @@ abstract class Validator
      * @param  mixed $option
      * @return bool
      */
-    protected final function isCallable(mixed $option): bool
+    protected function isCallable(mixed $option): bool
     {
         return ($option && is_callable($option));
     }
@@ -191,7 +189,7 @@ abstract class Validator
      * @param  string $type
      * @return bool
      */
-    protected final function isType(string $type): bool
+    protected function isType(string $type): bool
     {
         return is_type_of($this->input, $type);
     }
@@ -202,7 +200,7 @@ abstract class Validator
      * @param  string $spec
      * @return bool
      */
-    protected final function isMatch(string $spec): bool
+    protected function isMatch(string $spec): bool
     {
         return preg_test($spec, $this->input);
     }
@@ -215,7 +213,7 @@ abstract class Validator
      * @param  mixed  ...$messageParams
      * @return array
      */
-    protected final function error(int $code, string $message, mixed ...$messageParams): array
+    protected function error(int $code, string $message, mixed ...$messageParams): array
     {
         if ($messageParams) {
             $message = format($message, ...$messageParams);
@@ -231,11 +229,11 @@ abstract class Validator
      * @return froq\validation\validator\Validator
      * @throws froq\validation\validator\ValidatorException
      */
-    public static final function create(array $options): Validator
+    public static function create(array $options): Validator
     {
         // Callback spec overrides all validators.
         if (value($options, 'specType') === 'callback'
-            or value($options, 'spec') instanceof \Closure) {
+            || value($options, 'spec') instanceof \Closure) {
             return new CallbackValidator($options);
         }
 
@@ -249,7 +247,7 @@ abstract class Validator
             ValidationType::DATE,
             ValidationType::TIME,
             ValidationType::DATETIME => new DateTimeValidator($options),
-            ValidationType::UNIXTIME => new UnixTimeValidator($options),
+            ValidationType::EPOCH    => new EpochValidator($options),
             ValidationType::EMAIL    => new EmailValidator($options),
             ValidationType::URL      => new UrlValidator($options),
             ValidationType::UUID     => new UuidValidator($options),
@@ -258,7 +256,7 @@ abstract class Validator
             ValidationType::ARRAY    => new ArrayValidator($options),
 
             // Not implemented.
-            default => throw new ValidatorException('Invalid type `%s`', $options['type'])
+            default => throw new ValidatorException('Invalid type %q', $options['type'])
         };
     }
 

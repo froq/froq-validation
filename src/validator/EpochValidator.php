@@ -1,21 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\ValidationError;
 
 /**
  * @package froq\validation\validator
- * @object  froq\validation\validator\UnixTimeValidator
+ * @class   froq\validation\validator\EpochValidator
  * @author  Kerem Güneş
  * @since   6.0
  */
-class UnixTimeValidator extends Validator
+class EpochValidator extends Validator
 {
     /**
      * @inheritDoc froq\validation\validator\Validator
@@ -24,8 +22,7 @@ class UnixTimeValidator extends Validator
     {
         $this->prepare();
 
-        if ($this->result->isDropped()
-            || $this->result->isReturned()) {
+        if ($this->result->isDropped() || $this->result->isReturned()) {
             return $this->result;
         }
 
@@ -45,10 +42,10 @@ class UnixTimeValidator extends Validator
                 $stringInput = (string) $this->input;
                 if (!ctype_digit($stringInput)
                     // Checks only current times (use int for lesser times).
-                    || strlen($stringInput) != strlen((string) time())) {
+                    || strlen($stringInput) !== strlen((string) time())) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
-                        '%s value is not a valid unixtime.',
+                        '%s value is not a valid epoch.',
                         $this->inputLabel
                     );
 

@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\ValidationError;
 
 /**
  * @package froq\validation\validator
- * @object  froq\validation\validator\StringValidator
+ * @class   froq\validation\validator\StringValidator
  * @author  Kerem Güneş
  * @since   6.0
  */
@@ -24,8 +22,7 @@ class StringValidator extends Validator
     {
         $this->prepare();
 
-        if ($this->result->isDropped()
-            || $this->result->isReturned()) {
+        if ($this->result->isDropped() || $this->result->isReturned()) {
             return $this->result;
         }
 
@@ -52,7 +49,7 @@ class StringValidator extends Validator
         } else {
             [$spec, $specType] = $this->getOptions(['spec', 'specType']);
 
-            if ($spec && $specType == 'regexp') {
+            if ($spec && $specType === 'regexp') {
                 if (!$this->isMatch($spec)) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_MATCH,
@@ -67,7 +64,7 @@ class StringValidator extends Validator
 
                 $len = mb_strlen($this->input, $encoding);
 
-                if ($fixlen && $len != $fixlen) {
+                if ($fixlen && $len !== $fixlen) {
                     $this->result->error = $this->error(
                         ValidationError::LENGTH,
                         '%s value length must be %s.',

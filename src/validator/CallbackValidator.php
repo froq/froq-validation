@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\ValidationError;
 
 /**
  * @package froq\validation\validator
- * @object  froq\validation\validator\CallbackValidator
+ * @class   froq\validation\validator\CallbackValidator
  * @author  Kerem Güneş
  * @since   6.0
  */

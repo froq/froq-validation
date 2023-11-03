@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation;
 
 use froq\common\trait\OptionTrait;
@@ -13,24 +11,24 @@ use froq\common\trait\OptionTrait;
  * Validation class, runs validations by given rule sets.
  *
  * @package froq\validation
- * @object  froq\validation\Validation
+ * @class   froq\validation\Validation
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Validation
+class Validation
 {
     use OptionTrait;
 
-    /** @var array */
-    private array $rules;
+    /** Rules. */
+    private array $rules = [];
 
-    /** @var array */
-    private array $errors;
+    /** Errors. */
+    private ?array $errors = null;
 
-    /** @var array */
+    /** Default options. */
     private static array $optionsDefault = [
-        'throwErrors' => false, 'useFieldNameAsLabel' => true,
-        'dropUnknownFields' => true, 'populateAbsentFields' => true,
+        'throwErrors'       => false, 'useFieldNameAsLabel'  => true,
+        'dropUnknownFields' => true,  'populateAbsentFields' => true,
     ];
 
     /**
@@ -67,9 +65,9 @@ final class Validation
             // Nested (eg: [user => [image => [@fields => [id => [type => string], url => [type => url], ..]]]]).
             if (isset($rule['@fields'])) {
                 if (empty($rule['@fields'])) {
-                    throw new ValidationException('Rule `@fields` must be a non-empty array');
+                    throw new ValidationException('Rule @fields must be a non-empty array');
                 } elseif (!is_array($rule['@fields'])) {
-                    throw new ValidationException('Rule `@fields` must be an array, %t given', $rule);
+                    throw new ValidationException('Rule @fields must be an array, %t given', $rule);
                 }
 
                 $this->rules[$key] = new Rules($rule['@fields']);
@@ -84,21 +82,21 @@ final class Validation
     /**
      * Get rules.
      *
-     * @return ?array
+     * @return array
      */
-    public function getRules(): ?array
+    public function getRules(): array
     {
-        return $this->rules ?? null;
+        return $this->rules;
     }
 
     /**
      * Get errors property.
      *
-     * @return ?array
+     * @return array|null
      */
-    public function errors(): ?array
+    public function errors(): array|null
     {
-        return $this->errors ?? null;
+        return $this->errors;
     }
 
     /**

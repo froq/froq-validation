@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation\validator;
 
 use froq\validation\ValidationError;
 
 /**
  * @package froq\validation\validator
- * @object  froq\validation\validator\DateTimeValidator
+ * @class   froq\validation\validator\DateTimeValidator
  * @author  Kerem Güneş
  * @since   6.0
  */
@@ -24,8 +22,7 @@ class DateTimeValidator extends Validator
     {
         $this->prepare();
 
-        if ($this->result->isDropped()
-            || $this->result->isReturned()) {
+        if ($this->result->isDropped() || $this->result->isReturned()) {
             return $this->result;
         }
 
@@ -38,7 +35,7 @@ class DateTimeValidator extends Validator
         } else {
             [$spec, $specType, $type] = $this->getOptions(['spec', 'specType', 'type']);
 
-            if ($spec && $specType == 'regexp') {
+            if ($spec && $specType === 'regexp') {
                 if (!$this->isMatch($spec)) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_MATCH,
@@ -49,7 +46,7 @@ class DateTimeValidator extends Validator
             } else {
                 $date = date_create_from_format($spec, $this->input);
 
-                if (!$date || $date->format($spec) != $this->input) {
+                if (!$date || $date->format($spec) !== $this->input) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
                         '%s value is not a valid %s.',

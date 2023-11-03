@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * Copyright (c) 2015 · Kerem Güneş
  * Apache License 2.0 · http://github.com/froq/froq-validation
  */
-declare(strict_types=1);
-
 namespace froq\validation;
 
 use froq\validation\validator\{Validator, ValidatorResult};
@@ -14,24 +12,22 @@ use froq\validation\validator\{Validator, ValidatorResult};
  * field input by its options, filling `$error` property with last occured error.
  *
  * @package froq\validation
- * @object  froq\validation\Rule
+ * @class   froq\validation\Rule
  * @author  Kerem Güneş
  * @since   1.0
  */
-final class Rule
+class Rule
 {
-    /** @const array */
-    public const BOOLABLE_OPTIONS = [
-        'required', 'unsigned', 'nullable', 'strict', 'drop',
-    ];
+    /** Boolable options (given with no keys). */
+    public const BOOLABLE_OPTIONS = ['required', 'unsigned', 'nullable', 'strict', 'drop'];
 
-    /** @var string */
+    /** Field name. */
     public readonly string $field;
 
-    /** @var array */
+    /** Field options. */
     public readonly array $fieldOptions;
 
-    /** @var ?array */
+    /** Error. */
     private ?array $error = null;
 
     /**
@@ -51,12 +47,12 @@ final class Rule
         if ($type) {
             if (!in_array($type, ValidationType::all(), true)) {
                 throw new ValidationException(
-                    'Option `type` is invalid (given type: %s, available types: %a)',
+                    'Option "type" is invalid (given type: %s, available types: %a)',
                     [$type, ValidationType::all()]
                 );
-            } elseif (!$spec && $type == ValidationType::ENUM) {
+            } elseif (!$spec && $type === ValidationType::ENUM) {
                 throw new ValidationException(
-                    'Option `type.%s` requires `spec` definition as array in options (field: %s)',
+                    'Option "type.%s" requires "spec" definition as array in options (field: %s)',
                     [$type, $field]
                 );
             }
@@ -73,14 +69,14 @@ final class Rule
         if ($spec) {
             $specType = get_type($spec);
 
-            if ($type == ValidationType::ENUM && !equal($specType, 'array')) {
+            if ($type === ValidationType::ENUM && !equal($specType, 'array')) {
                 throw new ValidationException(
-                    'Invalid `spec` given, only an array accepted for enum types (field: %s)',
+                    'Invalid "spec" given, only an array accepted for enum types (field: %s)',
                     $field
                 );
-            } elseif ($type == ValidationType::JSON && !equal($spec, 'array', 'object')) {
+            } elseif ($type === ValidationType::JSON && !equal($spec, 'array', 'object')) {
                 throw new ValidationException(
-                    'Invalid `spec` given, only array and object accepted for json types (field: %s)',
+                    'Invalid "spec" given, only array and object accepted for json types (field: %s)',
                     $field
                 );
             }
@@ -90,7 +86,7 @@ final class Rule
                 $specType = 'callback';
             } else {
                 // Detect regexp spec.
-                if ($specType == 'string' && $spec[0] == '~') {
+                if ($specType === 'string' && $spec[0] === '~') {
                     $specType = 'regexp';
                 } elseif ($spec instanceof \RegExp) {
                     $spec     = $spec->pattern;
@@ -121,9 +117,9 @@ final class Rule
     /**
      * Get error property.
      *
-     * @return ?array
+     * @return array|null
      */
-    public function error(): ?array
+    public function error(): array|null
     {
         return $this->error;
     }
@@ -146,6 +142,8 @@ final class Rule
                     ?? format('Field %q', $inLabel ?? $this->field)
             );
 
+        $this->error = null;
+
         $result = $validator->validate($data);
         if ($error = $result->error) {
             $this->error = $error;
@@ -153,6 +151,6 @@ final class Rule
             $input = $validator->getInput();
         }
 
-        return ($this->error == null);
+        return ($this->error === null);
     }
 }
