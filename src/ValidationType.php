@@ -33,6 +33,6 @@ class ValidationType
     public static function all(): array
     {
         static $all; // For speed (diff: mem=~1Kb, cpu=~10x).
-        return $all ??= get_class_constants(self::class, false, false);
+        return $all ??= get_class_constants(self::class, false, assoc: false);
     }
 }
