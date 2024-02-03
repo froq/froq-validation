@@ -58,9 +58,12 @@ class StringValidator extends Validator
                     );
                 }
             } else {
-                [$encoding, $fixlen, $minlen, $maxlen, $limit, $quot, $html] = $this->getOptions(
-                    ['encoding', 'fixlen', 'minlen', 'maxlen', 'limit', 'quot', 'html']
+                [$encoding, $fixlen, $minlen, $maxlen, $limit, $quot, $html, $trim] = $this->getOptions(
+                    ['encoding', 'fixlen', 'minlen', 'maxlen', 'limit', 'quot', 'html', 'trim']
                 );
+
+                // Apply trim option.
+                $trim && $this->input = trim($this->input);
 
                 $len = mb_strlen($this->input, $encoding);
 
