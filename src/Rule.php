@@ -69,12 +69,12 @@ class Rule
         if ($spec) {
             $specType = get_type($spec);
 
-            if ($type === ValidationType::ENUM && !equal($specType, 'array')) {
+            if ($type === ValidationType::ENUM && !equals($specType, 'array')) {
                 throw new ValidationException(
                     'Invalid "spec" given, only an array accepted for enum types (field: %s)',
                     $field
                 );
-            } elseif ($type === ValidationType::JSON && !equal($spec, 'array', 'object')) {
+            } elseif ($type === ValidationType::JSON && !equals($spec, 'array', 'object')) {
                 throw new ValidationException(
                     'Invalid "spec" given, only array and object accepted for json types (field: %s)',
                     $field
