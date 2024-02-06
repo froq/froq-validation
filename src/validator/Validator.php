@@ -158,7 +158,7 @@ abstract class Validator
      */
     protected function isBlank(): bool
     {
-        return ($this->input === '' || $this->input === null);
+        return ($this->input === null || $this->input === '');
     }
 
     /**
@@ -169,7 +169,7 @@ abstract class Validator
      */
     protected function isTrue(mixed $option): bool
     {
-        return ($option && ($option === true || (is_scalar($option) && strval($option) === '1')));
+        return ($option && ($option === true || intval($option) === 1));
     }
 
     /**
