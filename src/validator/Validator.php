@@ -254,6 +254,7 @@ abstract class Validator
             ValidationType::JSON     => new JsonValidator($options),
             ValidationType::BOOL     => new BoolValidator($options),
             ValidationType::ARRAY    => new ArrayValidator($options),
+            ValidationType::ANY      => new AnyValidator($options),
 
             // Not implemented.
             default => throw new ValidatorException('Invalid type %q', $options['type'])
