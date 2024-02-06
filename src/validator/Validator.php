@@ -133,20 +133,18 @@ abstract class Validator
             }
         }
 
-        // Check required state.
+        // Check required option.
         if ($this->isBlank()) {
-            $required = $this->getOption('required');
-
-            if (!$required) {
-                $this->result->returned = true;
-            } elseif ($required) {
+            if ($this->getOption('required')) {
                 $this->result->error = $this->error(
                     ValidationError::REQUIRED,
                     '%s is required, none given.',
                     $this->inputLabel
                 );
-                $this->result->returned = false;
             }
+
+            // Nothing to validate.
+            $this->result->returned = true;
         }
     }
 
