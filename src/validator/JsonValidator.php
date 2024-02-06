@@ -37,8 +37,7 @@ class JsonValidator extends Validator
 
             // Validates array/object inputs only when spec given.
             if ($spec) {
-                $wrap = ($this->input[0] ?? '')
-                      . ($this->input[-1] ?? '');
+                $wrap = ($this->input[0] ?? '') . ($this->input[-1] ?? '');
 
                 if ($spec === 'array' && $wrap !== '[]') {
                     $this->result->error = $this->error(
