@@ -158,7 +158,7 @@ abstract class Validator
      */
     protected function isBlank(): bool
     {
-        return ($this->input === null || $this->input === '');
+        return ($this->input === '' || $this->input === null);
     }
 
     /**
