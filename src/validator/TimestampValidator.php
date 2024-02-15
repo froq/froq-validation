@@ -9,11 +9,11 @@ use froq\validation\ValidationError;
 
 /**
  * @package froq\validation\validator
- * @class   froq\validation\validator\EpochValidator
+ * @class   froq\validation\validator\TimestampValidator
  * @author  Kerem Güneş
  * @since   6.0
  */
-class EpochValidator extends Validator
+class TimestampValidator extends Validator
 {
     /**
      * @inheritDoc froq\validation\validator\Validator
@@ -45,7 +45,7 @@ class EpochValidator extends Validator
                     || strlen($stringInput) !== strlen((string) time())) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
-                        '%s value is not a valid epoch.',
+                        '%s value is not a valid timestamp.',
                         $this->inputLabel
                     );
 

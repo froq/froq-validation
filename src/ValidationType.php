@@ -16,14 +16,14 @@ namespace froq\validation;
 class ValidationType
 {
     /** Types. */
-    public const INT    = 'int',    FLOAT    = 'float',
-                 NUMBER = 'number', NUMERIC  = 'numeric',
-                 STRING = 'string', ENUM     = 'enum',
-                 EMAIL  = 'email',  DATE     = 'date',
-                 TIME   = 'time',   DATETIME = 'datetime',
-                 EPOCH  = 'epoch',  JSON     = 'json',
-                 URL    = 'url',    UUID     = 'uuid',
-                 BOOL   = 'bool',   ARRAY    = 'array',
+    public const INT       = 'int',       FLOAT    = 'float',
+                 NUMBER    = 'number',    NUMERIC  = 'numeric',
+                 STRING    = 'string',    ENUM     = 'enum',
+                 EMAIL     = 'email',     DATE     = 'date',
+                 TIME      = 'time',      DATETIME = 'datetime',
+                 TIMESTAMP = 'timestamp', JSON     = 'json',
+                 URL       = 'url',       UUID     = 'uuid',
+                 BOOL      = 'bool',      ARRAY    = 'array',
 
                  // Just to check "required" etc.
                  ANY    = 'any';
