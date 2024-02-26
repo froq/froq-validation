@@ -23,13 +23,7 @@ class ValidationError extends \froq\common\Error
     private ?array $errors = null;
 
     /**
-     * Constructor.
-     *
-     * @param string|Throwable|null $message
-     * @param mixed|null            $messageParams
-     * @param int|null              $code
-     * @param array|null            $errors
-     * @since 5.0
+     * @override
      */
     public function __construct(string|\Throwable $message = null, mixed $messageParams = null, int $code = null,
         array $errors = null)
@@ -52,7 +46,6 @@ class ValidationError extends \froq\common\Error
      * Get errors.
      *
      * @return array|null
-     * @since  5.0
      */
     public function errors(): array|null
     {
@@ -63,7 +56,6 @@ class ValidationError extends \froq\common\Error
      * Get tip.
      *
      * @return string
-     * @since  6.0
      */
     public static function tip(): string
     {
