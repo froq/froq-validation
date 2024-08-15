@@ -26,7 +26,7 @@ class DateTimeValidator extends Validator
             return $this->result;
         }
 
-        if (!$this->isType('string')) {
+        if (!$this->isType('string|DateTimeInterface')) {
             $this->result->error = $this->error(
                 ValidationError::TYPE,
                 '%s value must be string, %t given.',
@@ -43,6 +43,8 @@ class DateTimeValidator extends Validator
                         $this->inputLabel
                     );
                 }
+            } elseif ($this->input instanceof \DateTimeInterface) {
+                // Pass.
             } else {
                 $date = date_create_from_format($spec, $this->input);
 
