@@ -46,9 +46,7 @@ class DateTimeValidator extends Validator
             } elseif ($this->input instanceof \DateTimeInterface) {
                 // Pass.
             } else {
-                $date = date_create_from_format($spec, $this->input);
-
-                if (!$date || $date->format($spec) !== $this->input) {
+                if (!date_verify($this->input, $spec)) {
                     $this->result->error = $this->error(
                         ValidationError::NOT_VALID,
                         '%s value is not a valid %s.',

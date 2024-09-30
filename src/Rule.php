@@ -58,11 +58,11 @@ class Rule
             }
 
             // Set spec for date/time stuff if none given.
-            $spec || $spec = match ($type) {
+            $spec = $spec ?: match ($type) {
                 ValidationType::DATE     => 'Y-m-d',
                 ValidationType::TIME     => 'H:i:s',
                 ValidationType::DATETIME => 'Y-m-d H:i:s',
-                default                  => $spec
+                default                  => null
             };
         }
 
